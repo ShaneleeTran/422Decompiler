@@ -1,0 +1,149 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/8/2017 5:04:28 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000000  =0000000D                  7  CR      EQU $0D
+00000000  =0000000A                  8  LF      EQU $0A
+00000000                             9  
+00000000= 00000000                  10  START_ADDR  DC.L    0
+00000004= 00000000                  11  END_ADDR    DC.L    0
+00000008                            12  CUR_ADDR    DS.W    0        
+00000008                            13  
+00001000                            14      ORG    $1000
+00001000                            15      
+00001000                            16  START:                  ; first instruction of program
+00001000                            17  
+00001000                            18  * Put program code here
+00001000  43F9 000010BE             19          LEA     WELCOME_MSG,A1  ; welcome message
+00001006  103C 000E                 20          MOVE.B  #14,D0
+0000100A  4E4F                      21          TRAP    #15
+0000100C                            22      
+0000100C  43F9 000010E8             23          LEA     USER_START,A1  ; user start message
+00001012  103C 000E                 24          MOVE.B  #14,D0
+00001016  4E4F                      25          TRAP    #15
+00001018                            26      
+00001018  103C 0002                 27          MOVE.B  #2,D0           ;read user input as string
+0000101C  4E4F                      28          TRAP    #15
+0000101E                            29          
+0000101E                            30          ; ascii to hex        
+0000101E  4EB9 00001066             31          JSR     CHECK_HEX_LEN
+00001024  4EB9 0000108A             32          JSR     CHAR_TO_HEX
+0000102A                            33          
+0000102A  21D1 0000                 34          MOVE.L  (A1),START_ADDR   ; move hex into START_ADDR
+0000102E                            35          
+0000102E  43F9 00001101             36          LEA     USER_END,A1  ; user end message
+00001034  103C 000E                 37          MOVE.B  #14,D0
+00001038  4E4F                      38          TRAP    #15        
+0000103A                            39      
+0000103A  103C 0002                 40          MOVE.B  #2,D0           ;read user input as string
+0000103E  4E4F                      41          TRAP    #15
+00001040                            42          
+00001040                            43          ;ascii to hex                     
+00001040  4EB9 00001066             44          JSR     CHECK_HEX_LEN        
+00001046  4EB9 0000108A             45          JSR     CHAR_TO_HEX
+0000104C                            46          
+0000104C  21D1 0004                 47          MOVE.L  (A1),END_ADDR ;move hex into END_ADDR
+00001050                            48          
+00001050                            49          *scan memory region        
+00001050                            50  *MAIN_LOOP    MOVE.L    CUR_ADDR,A2
+00001050                            51  *        MOVE.L     END_ADDR,A3
+00001050                            52  *        CMPA.W  A2,A3
+00001050                            53  *        BEQ     END
+00001050                            54  
+00001050                            55  ;       MOVE.W  (A2)+,D5
+00001050  3C3C F000                 56          MOVE.W   #$f000,D6   0010 1111 1111 1111
+00001054  CC45                      57          AND.W    D5,D6          0010 000000000000
+00001056                            58          
+00001056  BC7C 0000                 59          CMP.W   #$0000,D6
+0000105A                            60          
+0000105A                            61          
+0000105A  BC7C 2000                 62          CMP.W   #$2000,D6
+0000105E  6700 EFAA                 63          BEQ     0010
+00001062                            64  *        MOVE.L (A0),D1
+00001062                            65  *        CLR.L   D0
+00001062                            66          *ROL.L   $#04,D1
+00001062                            67  *        MOVE.W  (A0),D0
+00001062                            68  *       BRA MAIN_LOOP        
+00001062                            69          
+00001062                            70          
+00001062                            71  END                
+00001062  FFFF FFFF                 72      SIMHALT             ; halt simulator
+00001066                            73  
+00001066  0C01 0000                 74  CHECK_HEX_LEN   CMPI.B #$0,D1   ;if length of Hex is 0
+0000106A  6700 000C                 75                  BEQ STOP_PROGRAM
+0000106E                            76                  
+0000106E  0C01 0008                 77                  CMPI.B  #$8,D1  ;if length of Hex is greater than 8
+00001072  6E00 0004                 78                  BGT STOP_PROGRAM
+00001076                            79                  
+00001076  4E75                      80                  RTS
+00001078                            81  
+00001078  43F9 0000111A             82  STOP_PROGRAM    LEA ERROR_MSG,A1    ;address error message
+0000107E  103C 000E                 83                  MOVE.B  #14,D0
+00001082  4E4F                      84                  TRAP    #15
+00001084  103C 0009                 85                  MOVE.B  #9,D0   ;end the program
+00001088  4E4F                      86                  TRAP    #15
+0000108A                            87  
+0000108A  0C01 0000                 88  CHAR_TO_HEX     CMPI.B  #$0,D1
+0000108E  6700 002C                 89                  BEQ     HEX_FINISHED
+00001092  1419                      90                  MOVE.B  (A1)+,D2    ;move right one character
+00001094  0C02 0039                 91                  CMPI.B  #$39,D2
+00001098  6F00 000A                 92                  BLE     NUM         ;if the character is a number less than 9
+0000109C                            93                  
+0000109C  0402 0025                 94  LETTER          SUB.B   #37,D2
+000010A0  6000 000A                 95                  BRA     RESIZE                
+000010A4                            96                  
+000010A4  0402 0030                 97  NUM             SUBI.B  #$30,D2
+000010A8  6000 0002                 98                  BRA     RESIZE
+000010AC                            99                  
+000010AC  5301                     100  RESIZE          SUBI.B  #$1,D1
+000010AE  D602                     101                  ADD.B   D2,D3
+000010B0  0C01 0000                102                  CMPI.B  #$0,D1
+000010B4  6700 0006                103                  BEQ     HEX_FINISHED
+000010B8                           104                  
+000010B8  E99B                     105                  ROL.L   #4,D3   ; rotate left 4 bits to the next char
+000010BA  60CE                     106                  BRA     CHAR_TO_HEX
+000010BC                           107                  
+000010BC                           108                  
+000010BC  4E75                     109  HEX_FINISHED    RTS
+000010BE                           110  * Put variables and constants here
+000010BE                           111  
+000010BE= 53 68 61 6E 65 6C ...    112  WELCOME_MSG DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
+000010E8= 45 6E 74 65 72 20 ...    113  USER_START DC.B     'Enter starting address: ',0
+00001101= 0D 0A 45 6E 74 65 ...    114  USER_END    DC.B    CR,LF,'Enter ending address: ',0
+0000111A= 0D 0A 49 6E 76 61 ...    115  ERROR_MSG   DC.B    CR,LF,'Invalid address',0
+0000112C= 0D 0A 79 6F 75 20 ...    116  TEST_MSG    DC.B    CR,LF,'you made it',0
+0000113A                           117  
+0000113A                           118      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CHAR_TO_HEX         108A
+CHECK_HEX_LEN       1066
+CR                  D
+CUR_ADDR            8
+END                 1062
+END_ADDR            4
+ERROR_MSG           111A
+HEX_FINISHED        10BC
+LETTER              109C
+LF                  A
+NUM                 10A4
+RESIZE              10AC
+START               1000
+START_ADDR          0
+STOP_PROGRAM        1078
+TEST_MSG            112C
+USER_END            1101
+USER_START          10E8
+WELCOME_MSG         10BE

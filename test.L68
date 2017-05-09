@@ -1,0 +1,95 @@
+00007000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 4/26/2017 11:14:15 PM
+
+00000000                             1  *****************************
+00000000                             2  *
+00000000                             3  *
+00000000                             4  * Created 2/18/2016
+00000000                             5  *
+00000000                             6  * Test program
+00000000                             7  *
+00000000                             8  *****************************
+00000000                             9  
+00000000  =00007000                 10  start           EQU     $00007000       * ORG and END address
+00000000                            11  
+00000000                            12  * ORG the program so that it straddles the address boundary $00007FFF to $00008000
+00000000                            13  
+00007000                            14                  ORG     start
+00007000                            15  
+00007000                            16  * NOP and similar instructions. Should clearly differentiate NOP and RTS from others.
+00007000                            17  
+00007000  4E71                      18                  NOP                     *Required
+00007002  4E75                      19                  RTS                     *Required
+00007004  4E72 2000                 20                  STOP    #$2000          * Not required instruction
+00007008                            21  
+00007008                            22  * This is a group of ADD instructions
+00007008                            23  
+00007008  0640 4000                 24  add_start       ADDI.W  #$4000,D0       
+0000700C                            25                  
+0000700C                            26  * This is a group of SUB instructions
+0000700C  9CD4                      27  subtracts       SUBA.W  (A4),A6
+0000700E                            28  
+0000700E                            29  * Group is random data
+0000700E                            30  
+0000700E= FF AA 45 0A               31  data1           DC.B            $FF,$AA,$45,$0A
+00007012                            32  
+00007012                            33  * Move instructions
+00007012                            34  
+00007012  1200                      35  moves           MOVE.B  D0,D1
+00007014                            36  
+00007014= 48 65 72 65 20 69 ...     37  data5           DC.B    'Here is some interspersed data'
+00007032                            38                  
+00007032                            39  * Divide and multiple optional instructions
+00007032                            40          
+00007032  0238 0001 4568            41  ands            AND.B   #$01,$4568
+00007038                            42  
+00007038  E120                      43  shifts          ASL.B   D0,D0
+0000703A                            44  
+0000703A  E5BB                      45  rolls           ROL.L   D2,D3
+0000703C                            46  
+0000703C  4244                      47  clear           CLR     D4
+0000703E                            48  
+0000703E  45F9 DC00FF00             49  load_addr       LEA     $DC00FF00,A2
+00007044                            50  
+00007044                            51  * random data   
+00007044= 0B85 019B 0B20 1EBD       52                  DC.W    2949,0411,2848,7869
+0000704C                            53  
+0000704C  BA13                      54  compares        CMP.B   (A3),D5
+0000704E                            55  
+0000704E                            56  * Branches      
+0000704E                            57                  
+0000704E                            58  
+0000704E                            59  * Jump and branch instructions
+0000704E                            60  
+0000704E  64FC                      61  jmplabel        BCC     compares                
+00007050  6EFA                      62                  BGT     compares                
+00007052  6FF8                      63                  BLE     compares        
+00007054                            64                  
+00007054                            65  *These are not required instructions
+00007054  C7C0                      66  multiply        MULS    D0,D3
+00007056  8AD3                      67                  DIVU    (A3),D5 *Optional instruction
+00007058                            68  
+00007058                            69                  END     start
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADD_START           7008
+ANDS                7032
+CLEAR               703C
+COMPARES            704C
+DATA1               700E
+DATA5               7014
+JMPLABEL            704E
+LOAD_ADDR           703E
+MOVES               7012
+MULTIPLY            7054
+ROLLS               703A
+SHIFTS              7038
+START               7000
+SUBTRACTS           700C
