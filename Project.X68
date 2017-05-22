@@ -249,6 +249,19 @@ DSMBLE
 
 ****************************************************************************
 FIRSTJMP
+        JSR     FIRST0001
+        
+FIRST0001
+        MOVE.B  #'M',(A3)+                  Insert M into the output
+        MOVE.B  #'O',(A3)+                  Insert O into the output
+        MOVE.B  #'V',(A3)+                  Insert V into the output
+        MOVE.B  #'E',(A3)+                  Insert E into the output
+        MOVE.B  #'.',(A3)+                  Insert . into the output
+        MOVE.B  #'B',(A3)+                  Insert B into the output
+        MOVE.B  #' ',(A3)+                  Insert a space into the output
+        MOVE.B  #' ',(A3)+                  Insert a space into the output
+    
+        RTS                                 Return the instruction
 
         
 END                
