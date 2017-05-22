@@ -63,6 +63,7 @@ USR_IN_END
         
         MOVEQ   #2,D0
         TRAP    #15
+        CLR.L   D3
         
         JSR     CHECK_INPUT_LEN
         
