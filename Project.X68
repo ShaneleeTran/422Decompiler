@@ -83,6 +83,7 @@ PASS_LEN_TEST2
         CMP.B   #1,D4
         BEQ     PASS_ODD_TEST2
         ;else
+        
         BRA     USR_IN_END
         
 PASS_ODD_TEST2
@@ -218,6 +219,7 @@ MAIN_LOOP
         LEA     GOODDATA, A3
         LEA     BADDATA, A4
         JSR     ADDRPRNT
+        JSR     BAD
         JSR     DSMBLE
         MOVE.B  #$00, (A3)+
         LEA     GOODDATA, A1
@@ -231,6 +233,18 @@ END_LOOP
         ADD.B   #1, CUR_LINE
         CMP.B   #29, CUR_LINE
         BRA     MAIN_LOOP
+
+BAD
+        MOVE.B	#'B',(A4)+			Insert B into the output
+        MOVE.B	#'A',(A4)+			Insert A into the output
+        MOVE.B	#'D',(A4)+			Insert D into the output
+        MOVE.B	#' ',(A4)+			Insert a space into the output
+        MOVE.B	#'D',(A4)+			Insert D into output
+        MOVE.B	#'A',(A4)+			Insert A into output
+        MOVE.B	#'T',(A4)+			Insert T into output
+        MOVE.B	#'A',(A4)+			Insert A into output
+        MOVE.B	#' ',(A4)+			Insert a space into output
+        MOVE.B #'$',(A4)+            Insert a $ into output
 
 
 ADDRPRNT
