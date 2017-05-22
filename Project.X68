@@ -5,11 +5,7 @@
 * Description:
 *-----------------------------------------------------------
 CR      EQU $0D
-LF      EQU $0A
-
-START_ADDR  DC.L    0
-END_ADDR    DC.L    0
-CUR_ADDR    DS.W    0        
+LF      EQU $0A       
 
     ORG    $1000
     
@@ -19,103 +15,237 @@ START:                  ; first instruction of program
         LEA     WELCOME_MSG,A1  ; welcome message
         MOVE.B  #14,D0
         TRAP    #15
-    
-        LEA     USER_START,A1  ; user start message
+        MOVE.B  #0,CUR_LINE
+        
+USR_IN_STRT
+        LEA     USR_STRT_MSG,A1  ; user start address message
         MOVE.B  #14,D0
         TRAP    #15
+        
+        LEA     STRT_INPUT,A1
     
         MOVE.B  #2,D0           ;read user input as string
         TRAP    #15
+              
+        JSR     CHECK_INPUT_LEN   ;checks the length of user input
         
-        ; ascii to hex        
-        JSR     CHECK_HEX_LEN
-        JSR     CHAR_TO_HEX
-        
-        MOVE.L  (A1),START_ADDR   ; move hex into START_ADDR
-        
-        LEA     USER_END,A1  ; user end message
+        CMP.B   #1,D4
+        BEQ     PASS_LEN_TEST        
+        ;else      
+        LEA     BAD_INPUT_MSG,A1
         MOVE.B  #14,D0
-        TRAP    #15        
-    
-        MOVE.B  #2,D0           ;read user input as string
+        TRAP    #15
+        BRA     USR_IN_STRT
+        
+PASS_LEN_TEST        
+        JSR     ASCII_TO_HEX
+        MOVEA.L D3,A5
+        
+        JSR     CHECK_INPUT_ODD
+        CMP.B   #1,D4
+        BEQ     PASS_ODD_TEST
+        ;else
+        BRA     USR_IN_STRT
+        
+PASS_ODD_TEST
+        JSR     CHECK_INPUT_BOUNDS
+        CMP.B   #0,D4
+        BEQ     USR_IN_STRT
+        MOVE.L  D3,D7
+        MOVEA.L D3,A5
+        
+USR_IN_END
+        LEA     USR_END_MSG,A1
+        MOVE.B  #14,D0
         TRAP    #15
         
-        ;ascii to hex                     
-        JSR     CHECK_HEX_LEN        
-        JSR     CHAR_TO_HEX
+        LEA     END_INPUT,A1
         
-        MOVE.L  (A1),END_ADDR ;move hex into END_ADDR
+        MOVEQ   #2,D0
+        TRAP    #15
         
-        *scan memory region        
-*MAIN_LOOP    MOVE.L    CUR_ADDR,A2
-*        MOVE.L     END_ADDR,A3
-*        CMPA.W  A2,A3
-*        BEQ     END
+        JSR     CHECK_INPUT_LEN
+        
+        CMP.B   #1,D4
+        BEQ     PASS_LEN_TEST2
+        ;else
+        LEA     BAD_INPUT_MSG,A1
+        MOVE.B  #14,D0
+        TRAP    #15
+        BRA     USR_IN_END
+        
+PASS_LEN_TEST2
+        JSR     ASCII_TO_HEX
+        MOVEA.L D3,A6
+        
+        JSR     CHECK_INPUT_ODD
+        CMP.B   #1,D4
+        BEQ     PASS_ODD_TEST2
+        ;else
+        BRA     USR_IN_END
+        
+PASS_ODD_TEST2
+        JSR     CHECK_INPUT_BOUNDS
+        CMP.B   #0,D4
+        BEQ     USR_IN_END
+        ;else
+        MOVEA.L D3,A6
+        
+        ADD     #2,A6
+        LEA     WAIT_MSG,A1
+        MOVE.B  #14,D0
+        TRAP    #15
+        BRA     CONT_INPUT
+        
+********************************************************************************
+CHECK_INPUT_LEN
+        CLR.L   D4
+        CMPI.B  #$0,D1   ;if length of Hex is 0
+        BEQ     BAD_INPUT
+        ;else        
+        CMPI.B  #$8,D1  ;if length of Hex is greater than 8
+        BGT     BAD_INPUT
+        ;else
+        MOVE.B  #$1,D4
+        RTS
 
-;       MOVE.W  (A2)+,D5
-        MOVE.W   #$f000,D6   0010 1111 1111 1111
-        AND.W    D5,D6          0010 000000000000
+********************************************************************************
+BAD_INPUT
+        MOVEQ   #$0,D4
+        RTS
         
-        CMP.W   #$0000,D6
+********************************************************************************        
+ASCII_TO_HEX
+        CMPI.B  #$0,D1
+        BEQ     ACII_TO_HEX_FINISHED
+        MOVE.B  (A1)+,D2    ;move right one character
+        CMPI.B  #$39,D2
+        BLE     NUM         ;if the character is a number less than 9      
+        ;else
+LETTER
+        SUBI.B  #$37,D2
+        BRA     RESIZE
+
+********************************************************************************                
+NUM
+        SUBI.B  #$30,D2
+        BRA     RESIZE
+
+********************************************************************************
+RESIZE
+        SUBI.B  #$1,D1
+        ADD.B   D2,D3
+        CMPI.B  #$0,D1
+        BEQ     ASCII_TO_HEX
+        ;else        
+        ROL.L   #4,D3   ; rotate left 4 bits to the next char
+        BRA     ASCII_TO_HEX
         
+*******************************************************************************
+ACII_TO_HEX_FINISHED
+        RTS
+
+*******************************************************************************
+CHECK_INPUT_ODD
+        CLR.L   D4
+        CLR.L   D2
+        MOVE.W  D3,D2
+        MOVE.L  #$00000002,D1
+        DIVU    D1,D2
+        SWAP    D2
+        CMP.B   #1,D2
+        BEQ     BAD_INPUT_ODD
+        ;else
+        MOVE.B  #$1,D4
+        RTS
         
-        CMP.W   #$2000,D6
-        BEQ     0010
-*        MOVE.L (A0),D1
-*        CLR.L   D0
-        *ROL.L   $#04,D1
-*        MOVE.W  (A0),D0
-*       BRA MAIN_LOOP        
+******************************************************************************
+BAD_INPUT_ODD
+        LEA     BAD_INPUT_ODD_MSG,A1
+        MOVE.B  #14,D0
+        TRAP    #15
+        MOVEQ   #$0,D4
+        CLR.L   D3
+        RTS
+
+*****************************************************************************        
+CHECK_INPUT_BOUNDS
+        CLR.L   D4
+        MOVE.L  #LOW_ADDR,D1
+        CMP.L   D1,D3
+        BLT     BAD_INPUT_LOW
+        ;else
+        MOVE.L  #HIGH_ADDR,D1
+        CMP.L   D1,D3
+        BGT     BAD_INPUT_HIGH
+        ;else
+        MOVEQ   #$1,D4
+        RTS
         
+*****************************************************************************
+BAD_INPUT_LOW
+        LEA     BAD_INPUT_LOW_MSG,A1
+        MOVE.B  #14,D0
+        TRAP    #15
+        MOVE.B  #$0,D4
+        CLR.L   D3
+        RTS
+        
+*****************************************************************************
+BAD_INPUT_HIGH
+        LEA     BAD_INPUT_HIGH_MSG,A1
+        MOVE.B  #14,D0
+        TRAP    #15
+        MOVE.B  #$0,D4
+        CLR.L   D3
+        RTS
+        
+*****************************************************************************
+CONT_INPUT
+        MOVE.B  #12,D0
+        MOVE.B  #0,D1
+        TRAP    #15
+        
+        MOVE.B  #5,D0        
+        TRAP    #15
+        
+        BRA     MAIN_LOOP
+
+****************************************************************************
+MAIN_LOOP     
+        
+
+
+
+
+
+
+
+
         
 END                
     SIMHALT             ; halt simulator
+               
 
-CHECK_HEX_LEN   CMPI.B #$0,D1   ;if length of Hex is 0
-                BEQ STOP_PROGRAM
-                
-                CMPI.B  #$8,D1  ;if length of Hex is greater than 8
-                BGT STOP_PROGRAM
-                
-                RTS
-
-STOP_PROGRAM    LEA ERROR_MSG,A1    ;address error message
-                MOVE.B  #14,D0
-                TRAP    #15
-                MOVE.B  #9,D0   ;end the program
-                TRAP    #15
-
-CHAR_TO_HEX     CMPI.B  #$0,D1
-                BEQ     HEX_FINISHED
-                MOVE.B  (A1)+,D2    ;move right one character
-                CMPI.B  #$39,D2
-                BLE     NUM         ;if the character is a number less than 9
-                
-LETTER          SUB.B   #37,D2
-                BRA     RESIZE                
-                
-NUM             SUBI.B  #$30,D2
-                BRA     RESIZE
-                
-RESIZE          SUBI.B  #$1,D1
-                ADD.B   D2,D3
-                CMPI.B  #$0,D1
-                BEQ     HEX_FINISHED
-                
-                ROL.L   #4,D3   ; rotate left 4 bits to the next char
-                BRA     CHAR_TO_HEX
-                
-                
-HEX_FINISHED    RTS
 * Put variables and constants here
-
+CUR_LINE    DS.B    1
+STRT_INPUT  DS.B    80
+END_INPUT   DS.B    80
 WELCOME_MSG DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
-USER_START DC.B     'Enter starting address: ',0
-USER_END    DC.B    CR,LF,'Enter ending address: ',0
-ERROR_MSG   DC.B    CR,LF,'Invalid address',0
+USR_STRT_MSG    DC.B    CR,LF,'Enter starting address: ',0
+USR_END_MSG    DC.B    CR,LF,'Enter ending address: ',0
+BAD_INPUT_MSG   DC.B    CR,LF,'Invalid address',0
+BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
+BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
+BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
+WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
 TEST_MSG    DC.B    CR,LF,'you made it',0
 
+LOW_ADDR    EQU     $00007000
+HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
+
 
 
 
