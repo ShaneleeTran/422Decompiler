@@ -213,14 +213,42 @@ CONT_INPUT
 
 ****************************************************************************
 MAIN_LOOP     
-        
+        CMP.W   (A5)+, D6
+        LEA     GOODDATA, A3
+        LEA     BADDATA, A4
+        JSR     ADDRPRNT
+        JSR     DSMBLE
+        MOVE.B  #$00, (A3)+
+        LEA     GOODDATA, A1
+        MOVEQ   #13,D0
+        TRAP    #15
+END_LOOP
+        CMP.W   A5,A6
+        BEQ     END
+        CMP.W   A6,A5
+        BGT     END
+        ADD.B   #1, CUR_LINE
+        CMP.B   #29, CUR_LINE
+        BRA     MAIN_LOOP
 
 
+ADDRPRNT
+        MOVEQ   #8, D0
+        MOVE.L  A5, D4
+        SUB.B   #2, D4
 
+DSMBLE  
+        CLR.B D1
+        MOVE.W D6,D5
+        LSR.W #8, D5
+        LSR.W #4, D5
+        MULU #8, D5
+        LEA FIRSTJMP, A0
+        JSR (A0,D5)
+        RTS
 
-
-
-
+****************************************************************************
+FIRSTJMP
 
         
 END                
@@ -240,10 +268,13 @@ BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
 BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
 WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
 TEST_MSG    DC.B    CR,LF,'you made it',0
+BADDATA DC.L 1
+GOODDATA DC.L 1
 
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
