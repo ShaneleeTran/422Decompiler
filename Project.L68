@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/22/2017 10:46:46 PM
+Created On: 5/23/2017 2:07:43 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :
@@ -16,17 +16,17 @@ Created On: 5/22/2017 10:46:46 PM
 00001000                            12  START:                  ; first instruction of program
 00001000                            13  
 00001000                            14  * Put program code here
-00001000  43F9 0000134B             15          LEA     WELCOME_MSG,A1  ; welcome message
+00001000  43F9 0000136B             15          LEA     WELCOME_MSG,A1  ; welcome message
 00001006  103C 000E                 16          MOVE.B  #14,D0
 0000100A  4E4F                      17          TRAP    #15
-0000100C  13FC 0000 000012AA        18          MOVE.B  #0,CUR_LINE
+0000100C  13FC 0000 000012CA        18          MOVE.B  #0,CUR_LINE
 00001014                            19          
 00001014                            20  USR_IN_STRT
-00001014  43F9 00001375             21          LEA     USR_STRT_MSG,A1  ; user start address message
+00001014  43F9 00001395             21          LEA     USR_STRT_MSG,A1  ; user start address message
 0000101A  103C 000E                 22          MOVE.B  #14,D0
 0000101E  4E4F                      23          TRAP    #15
 00001020                            24          
-00001020  43F9 000012AB             25          LEA     STRT_INPUT,A1
+00001020  43F9 000012CB             25          LEA     STRT_INPUT,A1
 00001026                            26      
 00001026  103C 0002                 27          MOVE.B  #2,D0           ;read user input as string
 0000102A  4E4F                      28          TRAP    #15
@@ -36,7 +36,7 @@ Created On: 5/22/2017 10:46:46 PM
 00001032  B83C 0001                 32          CMP.B   #1,D4
 00001036  6700 0010                 33          BEQ     PASS_LEN_TEST        
 0000103A                            34          ;else      
-0000103A  43F9 000013A9             35          LEA     BAD_INPUT_MSG,A1
+0000103A  43F9 000013C9             35          LEA     BAD_INPUT_MSG,A1
 00001040  103C 000E                 36          MOVE.B  #14,D0
 00001044  4E4F                      37          TRAP    #15
 00001046  60CC                      38          BRA     USR_IN_STRT
@@ -59,11 +59,11 @@ Created On: 5/22/2017 10:46:46 PM
 0000106E  2A43                      55          MOVEA.L D3,A5
 00001070                            56          
 00001070                            57  USR_IN_END
-00001070  43F9 00001390             58          LEA     USR_END_MSG,A1
+00001070  43F9 000013B0             58          LEA     USR_END_MSG,A1
 00001076  103C 000E                 59          MOVE.B  #14,D0
 0000107A  4E4F                      60          TRAP    #15
 0000107C                            61          
-0000107C  43F9 000012FB             62          LEA     END_INPUT,A1
+0000107C  43F9 0000131B             62          LEA     END_INPUT,A1
 00001082                            63          
 00001082  7002                      64          MOVEQ   #2,D0
 00001084  4E4F                      65          TRAP    #15
@@ -74,7 +74,7 @@ Created On: 5/22/2017 10:46:46 PM
 0000108E  B83C 0001                 70          CMP.B   #1,D4
 00001092  6700 0010                 71          BEQ     PASS_LEN_TEST2
 00001096                            72          ;else
-00001096  43F9 000013A9             73          LEA     BAD_INPUT_MSG,A1
+00001096  43F9 000013C9             73          LEA     BAD_INPUT_MSG,A1
 0000109C  103C 000E                 74          MOVE.B  #14,D0
 000010A0  4E4F                      75          TRAP    #15
 000010A2  60CC                      76          BRA     USR_IN_END
@@ -98,7 +98,7 @@ Created On: 5/22/2017 10:46:46 PM
 000010C8  2C43                      94          MOVEA.L D3,A6
 000010CA                            95          
 000010CA  544E                      96          ADD     #2,A6
-000010CC  43F9 0000141E             97          LEA     WAIT_MSG,A1
+000010CC  43F9 0000143E             97          LEA     WAIT_MSG,A1
 000010D2  103C 000E                 98          MOVE.B  #14,D0
 000010D6  4E4F                      99          TRAP    #15
 000010D8  6000 00C2                100          BRA     CONT_INPUT
@@ -167,7 +167,7 @@ Created On: 5/22/2017 10:46:46 PM
 00001144                           163          
 00001144                           164  ******************************************************************************
 00001144                           165  BAD_INPUT_ODD
-00001144  43F9 000013BB            166          LEA     BAD_INPUT_ODD_MSG,A1
+00001144  43F9 000013DB            166          LEA     BAD_INPUT_ODD_MSG,A1
 0000114A  103C 000E                167          MOVE.B  #14,D0
 0000114E  4E4F                     168          TRAP    #15
 00001150  7800                     169          MOVEQ   #$0,D4
@@ -190,7 +190,7 @@ Created On: 5/22/2017 10:46:46 PM
 00001174                           186          
 00001174                           187  *****************************************************************************
 00001174                           188  BAD_INPUT_LOW
-00001174  43F9 000013E7            189          LEA     BAD_INPUT_LOW_MSG,A1
+00001174  43F9 00001407            189          LEA     BAD_INPUT_LOW_MSG,A1
 0000117A  103C 000E                190          MOVE.B  #14,D0
 0000117E  4E4F                     191          TRAP    #15
 00001180  183C 0000                192          MOVE.B  #$0,D4
@@ -199,7 +199,7 @@ Created On: 5/22/2017 10:46:46 PM
 00001188                           195          
 00001188                           196  *****************************************************************************
 00001188                           197  BAD_INPUT_HIGH
-00001188  43F9 00001402            198          LEA     BAD_INPUT_HIGH_MSG,A1
+00001188  43F9 00001422            198          LEA     BAD_INPUT_HIGH_MSG,A1
 0000118E  103C 000E                199          MOVE.B  #14,D0
 00001192  4E4F                     200          TRAP    #15
 00001194  183C 0000                201          MOVE.B  #$0,D4
@@ -220,126 +220,134 @@ Created On: 5/22/2017 10:46:46 PM
 000011B0                           216  ****************************************************************************
 000011B0                           217  MAIN_LOOP     
 000011B0  3C1D                     218          MOVE.W   (A5)+, D6
-000011B2  47F9 0000144C            219          LEA     GOODDATA, A3
-000011B8  49F9 00001448            220          LEA     BADDATA, A4
-000011BE  4EB9 0000121E            221          JSR     ADDRPRNT
-000011C4                           222          *JSR     BAD
-000011C4  4EB9 00001264            223          JSR     DSMBLE
-000011CA  16FC 0000                224          MOVE.B  #$00, (A3)+
-000011CE  43F9 0000144C            225          LEA     GOODDATA, A1
-000011D4  700D                     226          MOVEQ   #13,D0
-000011D6  4E4F                     227          TRAP    #15
-000011D8                           228  END_LOOP
-000011D8  BCCD                     229          CMP.W   A5,A6
-000011DA  6700 00CA                230          BEQ     END
-000011DE  BACE                     231          CMP.W   A6,A5
-000011E0  6E00 00C4                232          BGT     END
-000011E4  5239 000012AA            233          ADD.B   #1, CUR_LINE
-000011EA  0C39 001D 000012AA       234          CMP.B   #29, CUR_LINE
-000011F2  60BC                     235          BRA     MAIN_LOOP
-000011F4                           236  ****************************************************************************
-000011F4                           237  
-000011F4                           238  BAD
-000011F4  18FC 0042                239          MOVE.B  #'B',(A4)+          Insert B into the output
-000011F8  18FC 0041                240          MOVE.B  #'A',(A4)+          Insert A into the output
-000011FC  18FC 0044                241          MOVE.B  #'D',(A4)+          Insert D into the output
-00001200  18FC 0020                242          MOVE.B  #' ',(A4)+          Insert a space into the output
-00001204  18FC 0044                243          MOVE.B  #'D',(A4)+          Insert D into output
-00001208  18FC 0041                244          MOVE.B  #'A',(A4)+          Insert A into output
-0000120C  18FC 0054                245          MOVE.B  #'T',(A4)+          Insert T into output
-00001210  18FC 0041                246          MOVE.B  #'A',(A4)+          Insert A into output
-00001214  18FC 0020                247          MOVE.B  #' ',(A4)+          Insert a space into output
-00001218  18FC 0024                248          MOVE.B #'$',(A4)+           Insert a $ into output
-0000121C                           249  
-0000121C                           250  BAD_PRINT
-0000121C  4E75                     251          RTS
-0000121E                           252  
-0000121E                           253  ADDRPRNT
-0000121E  7008                     254          MOVEQ   #8, D0
-00001220  280D                     255          MOVE.L  A5, D4
-00001222  5504                     256          SUB.B   #2, D4
-00001224                           257  
-00001224                           258  GET_MSB
-00001224  E99C                     259          ROL.L   #4,D4
-00001226  2A04                     260          MOVE.L  D4,D5
-00001228  0285 0000000F            261          ANDI.L  #$0000000F, D5
-0000122E                           262          
-0000122E                           263  ASCII_CHECK
-0000122E  0C05 0009                264          CMPI.B #$09,D5
-00001232  6F00 000A                265          BLE     CHAR_TO_NUM
-00001236                           266          ;else
-00001236                           267  CHAR_TO_ALPHABET        
-00001236  0605 0037                268          ADDI.B  #$37,D5
-0000123A  6000 000A                269          BRA     MOVE_TO_GOOD_DATA
-0000123E                           270          
-0000123E                           271  CHAR_TO_NUM
-0000123E  0605 0030                272          ADDI.B  #$30,D5
-00001242  6000 0002                273          BRA     MOVE_TO_GOOD_DATA
-00001246                           274          
-00001246                           275  MOVE_TO_GOOD_DATA
-00001246  5300                     276          SUBI.B  #1,D0
-00001248  16C5                     277          MOVE.B  D5,(A3)+
-0000124A  18C5                     278          MOVE.B  D5,(A4)+
-0000124C  0C00 0000                279          CMPI.B  #0,D0
-00001250  6ED2                     280          BGT     GET_MSB
-00001252  16FC 0020                281          MOVE.B  #$20,(A3)+
-00001256  16FC 0020                282          MOVE.B  #$20,(A3)+
-0000125A  18FC 0020                283          MOVE.B  #$20,(A4)+
-0000125E  18FC 0020                284          MOVE.B  #$20,(A4)+
-00001262  4E75                     285          RTS
-00001264                           286  ***************************************************************************
-00001264                           287          
-00001264                           288  DSMBLE  
-00001264  4201                     289          CLR.B   D1
-00001266  3A06                     290          MOVE.W  D6,D5
-00001268  E04D                     291          LSR.W   #8, D5
-0000126A  E84D                     292          LSR.W   #4, D5
-0000126C  CAFC 0008                293          MULU    #8, D5
-00001270  41F9 0000127C            294          LEA     FIRSTJMP, A0
-00001276  4EB0 5000                295          JSR     (A0,D5)
-0000127A  4E75                     296          RTS
-0000127C                           297  
-0000127C                           298  ****************************************************************************
-0000127C                           299  FIRSTJMP
-0000127C  4EB9 00001284            300          JSR     FIRST0001
-00001282  4E75                     301          RTS
-00001284                           302          
-00001284                           303  FIRST0001
-00001284  16FC 004D                304          MOVE.B  #'M',(A3)+                  Insert M into the output
-00001288  16FC 004F                305          MOVE.B  #'O',(A3)+                  Insert O into the output
-0000128C  16FC 0056                306          MOVE.B  #'V',(A3)+                  Insert V into the output
-00001290  16FC 0045                307          MOVE.B  #'E',(A3)+                  Insert E into the output
-00001294  16FC 002E                308          MOVE.B  #'.',(A3)+                  Insert . into the output
-00001298  16FC 0042                309          MOVE.B  #'B',(A3)+                  Insert B into the output
-0000129C  16FC 0020                310          MOVE.B  #' ',(A3)+                  Insert a space into the output
-000012A0  16FC 0020                311          MOVE.B  #' ',(A3)+                  Insert a space into the output
-000012A4                           312      
-000012A4  4E75                     313          RTS                                 Return the instruction
-000012A6                           314  
-000012A6                           315          
-000012A6                           316  END                
-000012A6  FFFF FFFF                317      SIMHALT             ; halt simulator
-000012AA                           318                 
-000012AA                           319  
-000012AA                           320  * Put variables and constants here
-000012AA                           321  CUR_LINE    DS.B    1
-000012AB                           322  STRT_INPUT  DS.B    80
-000012FB                           323  END_INPUT   DS.B    80
-0000134B= 53 68 61 6E 65 6C ...    324  WELCOME_MSG DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
-00001375= 0D 0A 45 6E 74 65 ...    325  USR_STRT_MSG    DC.B    CR,LF,'Enter starting address: ',0
-00001390= 0D 0A 45 6E 74 65 ...    326  USR_END_MSG    DC.B    CR,LF,'Enter ending address: ',0
-000013A9= 0D 0A 49 6E 76 61 ...    327  BAD_INPUT_MSG   DC.B    CR,LF,'Invalid address',0
-000013BB= 0D 0A 49 6E 76 61 ...    328  BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
-000013E7= 0D 0A 49 6E 76 61 ...    329  BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
-00001402= 0D 0A 49 6E 76 61 ...    330  BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
-0000141E= 0D 0A 50 72 65 73 ...    331  WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
-0000143A= 0D 0A 79 6F 75 20 ...    332  TEST_MSG    DC.B    CR,LF,'you made it',0
-00001448= 00000001                 333  BADDATA DC.L 1
-0000144C= 00000001                 334  GOODDATA DC.L 1
-00001450                           335  
-00001450  =00007000                336  LOW_ADDR    EQU     $00007000
-00001450  =00FFFFFE                337  HIGH_ADDR   EQU     $00FFFFFE
-00001450                           338      END    START        ; last line of source
+000011B2  47F9 0000146C            219          LEA     GOODDATA, A3
+000011B8  49F9 00001468            220          LEA     BADDATA, A4
+000011BE  4EB9 0000122A            221          JSR     ADDRPRNT
+000011C4  4EB9 00001202            222          JSR     BAD
+000011CA  4EB9 00001284            223          JSR     DSMBLE
+000011D0  BE38 00FF                224          CMP.B   $FF,D7
+000011D4  6700 009A                225          BEQ     BAD_PRINT
+000011D8  16FC 0000                226          MOVE.B  #$00, (A3)+
+000011DC  43F9 0000146C            227          LEA     GOODDATA, A1
+000011E2  700D                     228          MOVEQ   #13,D0
+000011E4  4E4F                     229          TRAP    #15
+000011E6                           230  END_LOOP
+000011E6  BCCD                     231          CMP.W   A5,A6
+000011E8  6700 00DC                232          BEQ     END
+000011EC  BACE                     233          CMP.W   A6,A5
+000011EE  6E00 00D6                234          BGT     END
+000011F2  5239 000012CA            235          ADD.B   #1, CUR_LINE
+000011F8  0C39 001D 000012CA       236          CMP.B   #29, CUR_LINE
+00001200  60AE                     237          BRA     MAIN_LOOP
+00001202                           238  ****************************************************************************
+00001202                           239  
+00001202                           240  BAD
+00001202  18FC 0042                241          MOVE.B  #'B',(A4)+          Insert B into the output
+00001206  18FC 0041                242          MOVE.B  #'A',(A4)+          Insert A into the output
+0000120A  18FC 0044                243          MOVE.B  #'D',(A4)+          Insert D into the output
+0000120E  18FC 0020                244          MOVE.B  #' ',(A4)+          Insert a space into the output
+00001212  18FC 0044                245          MOVE.B  #'D',(A4)+          Insert D into output
+00001216  18FC 0041                246          MOVE.B  #'A',(A4)+          Insert A into output
+0000121A  18FC 0054                247          MOVE.B  #'T',(A4)+          Insert T into output
+0000121E  18FC 0041                248          MOVE.B  #'A',(A4)+          Insert A into output
+00001222  18FC 0020                249          MOVE.B  #' ',(A4)+          Insert a space into output
+00001226  18FC 0024                250          MOVE.B #'$',(A4)+           Insert a $ into output
+0000122A                           251          
+0000122A                           252  ADDRPRNT
+0000122A  7008                     253          MOVEQ   #8, D0
+0000122C  280D                     254          MOVE.L  A5, D4
+0000122E  5504                     255          SUB.B   #2, D4
+00001230                           256  
+00001230                           257  GET_MSB
+00001230  E99C                     258          ROL.L   #4,D4
+00001232  2A04                     259          MOVE.L  D4,D5
+00001234  0285 0000000F            260          ANDI.L  #$0000000F, D5
+0000123A                           261          
+0000123A                           262  ASCII_CHECK
+0000123A  0C05 0009                263          CMPI.B #$09,D5
+0000123E  6F00 000A                264          BLE     CHAR_TO_NUM
+00001242                           265          ;else
+00001242                           266  CHAR_TO_ALPHABET        
+00001242  0605 0037                267          ADDI.B  #$37,D5
+00001246  6000 000A                268          BRA     MOVE_TO_GOOD_DATA
+0000124A                           269          
+0000124A                           270  CHAR_TO_NUM
+0000124A  0605 0030                271          ADDI.B  #$30,D5
+0000124E  6000 0002                272          BRA     MOVE_TO_GOOD_DATA
+00001252                           273          
+00001252                           274  MOVE_TO_GOOD_DATA
+00001252  5300                     275          SUBI.B  #1,D0
+00001254  16C5                     276          MOVE.B  D5,(A3)+
+00001256  18C5                     277          MOVE.B  D5,(A4)+
+00001258  0C00 0000                278          CMPI.B  #0,D0
+0000125C  6ED2                     279          BGT     GET_MSB
+0000125E  16FC 0020                280          MOVE.B  #$20,(A3)+
+00001262  16FC 0020                281          MOVE.B  #$20,(A3)+
+00001266  18FC 0020                282          MOVE.B  #$20,(A4)+
+0000126A  18FC 0020                283          MOVE.B  #$20,(A4)+
+0000126E  4E75                     284          RTS
+00001270                           285          
+00001270                           286  ***************************************************************************
+00001270                           287  BAD_PRINT
+00001270  18FC 0000                288          MOVE.B  #$00,(A4)+
+00001274  43F9 00001468            289          LEA     BADDATA,A1
+0000127A  700D                     290          MOVEQ   #13,D0
+0000127C  4E4F                     291          TRAP    #15
+0000127E  4287                     292          CLR.L   D7
+00001280  6000 FF64                293          BRA     END_LOOP
+00001284                           294  
+00001284                           295  ***************************************************************************
+00001284                           296  DSMBLE  
+00001284  4201                     297          CLR.B   D1
+00001286  3A06                     298          MOVE.W  D6,D5
+00001288  E04D                     299          LSR.W   #8, D5
+0000128A  E84D                     300          LSR.W   #4, D5
+0000128C  CAFC 0008                301          MULU    #8, D5
+00001290  41F9 0000129C            302          LEA     FIRSTJMP, A0
+00001296  4EB0 5000                303          JSR     (A0,D5) *0(A0,D5)?
+0000129A  4E75                     304          RTS
+0000129C                           305  
+0000129C                           306  ****************************************************************************
+0000129C                           307  FIRSTJMP
+0000129C  4EB9 000012A4            308          JSR     FIRST0001
+000012A2  4E75                     309          RTS
+000012A4                           310          
+000012A4                           311  FIRST0001
+000012A4  16FC 004D                312          MOVE.B  #'M',(A3)+                  Insert M into the output
+000012A8  16FC 004F                313          MOVE.B  #'O',(A3)+                  Insert O into the output
+000012AC  16FC 0056                314          MOVE.B  #'V',(A3)+                  Insert V into the output
+000012B0  16FC 0045                315          MOVE.B  #'E',(A3)+                  Insert E into the output
+000012B4  16FC 002E                316          MOVE.B  #'.',(A3)+                  Insert . into the output
+000012B8  16FC 0042                317          MOVE.B  #'B',(A3)+                  Insert B into the output
+000012BC  16FC 0020                318          MOVE.B  #' ',(A3)+                  Insert a space into the output
+000012C0  16FC 0020                319          MOVE.B  #' ',(A3)+                  Insert a space into the output
+000012C4                           320      
+000012C4  4E75                     321          RTS                                 Return the instruction
+000012C6                           322  
+000012C6                           323          
+000012C6                           324  END                
+000012C6  FFFF FFFF                325      SIMHALT             ; halt simulator
+000012CA                           326                 
+000012CA                           327  
+000012CA                           328  * Put variables and constants here
+000012CA                           329  CUR_LINE    DS.B    1
+000012CB                           330  STRT_INPUT  DS.B    80
+0000131B                           331  END_INPUT   DS.B    80
+0000136B= 53 68 61 6E 65 6C ...    332  WELCOME_MSG DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
+00001395= 0D 0A 45 6E 74 65 ...    333  USR_STRT_MSG    DC.B    CR,LF,'Enter starting address: ',0
+000013B0= 0D 0A 45 6E 74 65 ...    334  USR_END_MSG    DC.B    CR,LF,'Enter ending address: ',0
+000013C9= 0D 0A 49 6E 76 61 ...    335  BAD_INPUT_MSG   DC.B    CR,LF,'Invalid address',0
+000013DB= 0D 0A 49 6E 76 61 ...    336  BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
+00001407= 0D 0A 49 6E 76 61 ...    337  BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
+00001422= 0D 0A 49 6E 76 61 ...    338  BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
+0000143E= 0D 0A 50 72 65 73 ...    339  WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
+0000145A= 0D 0A 79 6F 75 20 ...    340  TEST_MSG    DC.B    CR,LF,'you made it',0
+00001468= 00000001                 341  BADDATA DC.L 1
+0000146C= 00000001                 342  GOODDATA DC.L 1
+00001470                           343  
+00001470  =00007000                344  LOW_ADDR    EQU     $00007000
+00001470  =00FFFFFE                345  HIGH_ADDR   EQU     $00FFFFFE
+00001470                           346      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -349,42 +357,42 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 ACII_TO_HEX_FINISHED  1128
-ADDRPRNT            121E
-ASCII_CHECK         122E
+ADDRPRNT            122A
+ASCII_CHECK         123A
 ASCII_TO_HEX        10F8
-BAD                 11F4
-BADDATA             1448
+BAD                 1202
+BADDATA             1468
 BAD_INPUT           10F4
 BAD_INPUT_HIGH      1188
-BAD_INPUT_HIGH_MSG  1402
+BAD_INPUT_HIGH_MSG  1422
 BAD_INPUT_LOW       1174
-BAD_INPUT_LOW_MSG   13E7
-BAD_INPUT_MSG       13A9
+BAD_INPUT_LOW_MSG   1407
+BAD_INPUT_MSG       13C9
 BAD_INPUT_ODD       1144
-BAD_INPUT_ODD_MSG   13BB
-BAD_PRINT           121C
-CHAR_TO_ALPHABET    1236
-CHAR_TO_NUM         123E
+BAD_INPUT_ODD_MSG   13DB
+BAD_PRINT           1270
+CHAR_TO_ALPHABET    1242
+CHAR_TO_NUM         124A
 CHECK_INPUT_BOUNDS  1156
 CHECK_INPUT_LEN     10DC
 CHECK_INPUT_ODD     112A
 CONT_INPUT          119C
 CR                  D
-CUR_LINE            12AA
-DSMBLE              1264
-END                 12A6
-END_INPUT           12FB
-END_LOOP            11D8
-FIRST0001           1284
-FIRSTJMP            127C
-GET_MSB             1224
-GOODDATA            144C
+CUR_LINE            12CA
+DSMBLE              1284
+END                 12C6
+END_INPUT           131B
+END_LOOP            11E6
+FIRST0001           12A4
+FIRSTJMP            129C
+GET_MSB             1230
+GOODDATA            146C
 HIGH_ADDR           FFFFFE
 LETTER              110A
 LF                  A
 LOW_ADDR            7000
 MAIN_LOOP           11B0
-MOVE_TO_GOOD_DATA   1246
+MOVE_TO_GOOD_DATA   1252
 NUM                 1112
 PASS_LEN_TEST       1048
 PASS_LEN_TEST2      10A4
@@ -392,11 +400,11 @@ PASS_ODD_TEST       1060
 PASS_ODD_TEST2      10BC
 RESIZE              111A
 START               1000
-STRT_INPUT          12AB
-TEST_MSG            143A
-USR_END_MSG         1390
+STRT_INPUT          12CB
+TEST_MSG            145A
+USR_END_MSG         13B0
 USR_IN_END          1070
 USR_IN_STRT         1014
-USR_STRT_MSG        1375
-WAIT_MSG            141E
-WELCOME_MSG         134B
+USR_STRT_MSG        1395
+WAIT_MSG            143E
+WELCOME_MSG         136B

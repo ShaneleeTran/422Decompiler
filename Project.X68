@@ -219,8 +219,10 @@ MAIN_LOOP
         LEA     GOODDATA, A3
         LEA     BADDATA, A4
         JSR     ADDRPRNT
-        *JSR     BAD    loads bad data for printing skipped for now
+        JSR     BAD
         JSR     DSMBLE
+        CMP.B   $FF,D7
+        BEQ     BAD_PRINT
         MOVE.B  #$00, (A3)+
         LEA     GOODDATA, A1
         MOVEQ   #13,D0
@@ -246,10 +248,7 @@ BAD
         MOVE.B	#'A',(A4)+			Insert A into output
         MOVE.B	#' ',(A4)+			Insert a space into output
         MOVE.B #'$',(A4)+           Insert a $ into output
-
-BAD_PRINT
-        RTS
-
+        
 ADDRPRNT
         MOVEQ   #8, D0
         MOVE.L  A5, D4
@@ -283,8 +282,17 @@ MOVE_TO_GOOD_DATA
         MOVE.B  #$20,(A4)+
         MOVE.B  #$20,(A4)+
         RTS
-***************************************************************************
         
+***************************************************************************
+BAD_PRINT
+        MOVE.B  #$00,(A4)+
+        LEA     BADDATA,A1
+        MOVEQ   #13,D0
+        TRAP    #15
+        CLR.L   D7
+        BRA     END_LOOP
+
+***************************************************************************
 DSMBLE  
         CLR.B   D1
         MOVE.W  D6,D5
@@ -336,6 +344,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
