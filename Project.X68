@@ -249,6 +249,10 @@ BAD
         MOVE.B	#' ',(A4)+			Insert a space into output
         MOVE.B #'$',(A4)+           Insert a $ into output
         
+*BAD_GET
+        MOVEQ   #4,D0
+        MOVE.W  D6,D4
+        
 ADDRPRNT
         MOVEQ   #8, D0
         MOVE.L  A5, D4
@@ -300,7 +304,7 @@ DSMBLE
         LSR.W   #4, D5
         MULU    #8, D5
         LEA     FIRSTJMP, A0
-        JSR     (A0,D5) *0(A0,D5)?
+        JSR     0(A0,D5) *0(A0,D5)?
         RTS
 
 ****************************************************************************
