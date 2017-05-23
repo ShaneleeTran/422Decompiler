@@ -215,11 +215,11 @@ CONT_INPUT
 
 ****************************************************************************
 MAIN_LOOP     
-        CMP.W   (A5)+, D6
+        MOVE.W   (A5)+, D6
         LEA     GOODDATA, A3
         LEA     BADDATA, A4
         JSR     ADDRPRNT
-        JSR     BAD
+        *JSR     BAD    loads bad data for printing skipped for now
         JSR     DSMBLE
         MOVE.B  #$00, (A3)+
         LEA     GOODDATA, A1
@@ -233,6 +233,7 @@ END_LOOP
         ADD.B   #1, CUR_LINE
         CMP.B   #29, CUR_LINE
         BRA     MAIN_LOOP
+****************************************************************************
 
 BAD
         MOVE.B	#'B',(A4)+			Insert B into the output
@@ -244,27 +245,60 @@ BAD
         MOVE.B	#'T',(A4)+			Insert T into output
         MOVE.B	#'A',(A4)+			Insert A into output
         MOVE.B	#' ',(A4)+			Insert a space into output
-        MOVE.B #'$',(A4)+            Insert a $ into output
+        MOVE.B #'$',(A4)+           Insert a $ into output
 
+BAD_PRINT
+        RTS
 
 ADDRPRNT
         MOVEQ   #8, D0
         MOVE.L  A5, D4
         SUB.B   #2, D4
 
+GET_MSB
+        ROL.L   #4,D4
+        MOVE.L  D4,D5
+        ANDI.L  #$0000000F, D5
+        
+ASCII_CHECK
+        CMPI.B #$09,D5
+        BLE     CHAR_TO_NUM
+        ;else
+CHAR_TO_ALPHABET        
+        ADDI.B  #$37,D5
+        BRA     MOVE_TO_GOOD_DATA
+        
+CHAR_TO_NUM
+        ADDI.B  #$30,D5
+        BRA     MOVE_TO_GOOD_DATA
+        
+MOVE_TO_GOOD_DATA
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     GET_MSB
+        MOVE.B  #$20,(A3)+
+        MOVE.B  #$20,(A3)+
+        MOVE.B  #$20,(A4)+
+        MOVE.B  #$20,(A4)+
+        RTS
+***************************************************************************
+        
 DSMBLE  
-        CLR.B D1
-        MOVE.W D6,D5
-        LSR.W #8, D5
-        LSR.W #4, D5
-        MULU #8, D5
-        LEA FIRSTJMP, A0
-        JSR (A0,D5)
+        CLR.B   D1
+        MOVE.W  D6,D5
+        LSR.W   #8, D5
+        LSR.W   #4, D5
+        MULU    #8, D5
+        LEA     FIRSTJMP, A0
+        JSR     (A0,D5) *0(A0,D5)?
         RTS
 
 ****************************************************************************
 FIRSTJMP
         JSR     FIRST0001
+        RTS
         
 FIRST0001
         MOVE.B  #'M',(A3)+                  Insert M into the output
@@ -302,6 +336,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
