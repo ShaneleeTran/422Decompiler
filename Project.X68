@@ -309,115 +309,276 @@ DSMBLE
 
 ****************************************************************************
 FIRSTJMP
-        JSR     FIRST0001
+        JSR     OPCODE0001
         RTS
 
 ****************************************************************************        
-FIRST0001
-        MOVE.B  #'M',(A3)+                  move M into the output
-        MOVE.B  #'O',(A3)+                  move O into the output
-        MOVE.B  #'V',(A3)+                  move V into the output
-        MOVE.B  #'E',(A3)+                  move E into the output
-        MOVE.B  #'.',(A3)+                  move . into the output
-        MOVE.B  #'B',(A3)+                  move B into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
+OPCODE0001
+        MOVE.B  #'M',(A3)+  ;move M into the output
+        MOVE.B  #'O',(A3)+  ;move O into the output
+        MOVE.B  #'V',(A3)+  ;move V into the output
+        MOVE.B  #'E',(A3)+  ;move E into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
+        MOVE.B  #'B',(A3)+  ;move B into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
     
-        RTS                                 Return the instruction
+        RTS
         
 *****************************************************************************
-FIRST0010
-        MOVE.B  #'M',(A3)+                  move M into the output
-        MOVE.B  #'O',(A3)+                  move O into the output
-        MOVE.B  #'V',(A3)+                  move V into the output
-        MOVE.B  #'E',(A3)+                  move E into the output
-        MOVE.B  #'.',(A3)+                  move . into the output
-        MOVE.B  #'L',(A3)+                  move L into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
+OPCODE0010
+        MOVE.B  #'M',(A3)+  ;move M into the output
+        MOVE.B  #'O',(A3)+  ;move O into the output
+        MOVE.B  #'V',(A3)+  ;move V into the output
+        MOVE.B  #'E',(A3)+  ;move E into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
+        MOVE.B  #'L',(A3)+  ;move L into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
         MOVEQ   #1,D1
         
-        RTS                                 Return the instruction
+        RTS
 
 ****************************************************************************
-FIRST0011
-        MOVE.B  #'M',(A3)+                  move M into the output
-        MOVE.B  #'O',(A3)+                  move O into the output
-        MOVE.B  #'V',(A3)+                  move V into the output
-        MOVE.B  #'E',(A3)+                  move E into the output
-        MOVE.B  #'.',(A3)+                  move . into the output
-        MOVE.B  #'W',(A3)+                  move W into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
-        MOVE.B  #' ',(A3)+                  move a space into the output
+OPCODE0011
+        MOVE.B  #'M',(A3)+  ;move M into the output
+        MOVE.B  #'O',(A3)+  ;move O into the output
+        MOVE.B  #'V',(A3)+  ;move V into the output
+        MOVE.B  #'E',(A3)+  ;move E into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
+        MOVE.B  #'W',(A3)+  ;move W into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
         
-        RTS                                 Return the instruction
+        RTS
 
 ***************************************************************************
-FIRST0100
-    MOVE.W  D6,D5
-    LSR.W   #$8,D5
-    ANDI.W  #$000F,D5
-    MULU    8,D5
-    *LEA     
-    JSR     00(A0,D5)
-    RTS
+OPCODE0100
+        MOVE.W  D6,D5
+        LSR.W   #$8,D5
+        ANDI.W  #$000F,D5
+        MULU    8,D5
+        *LEA    FOURTABLE,A0
+        JSR     00(A0,D5)
+        RTS
     
 **************************************************************************    
-FIRST0101
-    MOVE.B  #'S',(A3)+  ;move S into the output
-    MOVE.B  #'U',(A3)+  ;move U into the output
-    MOVE.B  #'B',(A3)+  ;move B into the output
-    MOVE.B  #'Q',(A3)+  ;move Q into the output
-    MOVE.B  #'.',(A3)+  ;move . into the output
-    JSR     GETLENGTH   ;get length of add
-    CMP.B   #%00,D3
-    BEQ     SUBQBYTE
-    ;else
-    CMP.B   #$01,D3
-    BEQ     SUBQWORD
-    ;else
-    CMP.B   #$02,D3
-    BEQ     SUBQLONG
-    ;else
-    MOVE.B  $11,D7
-    RTS
+OPCODE0101
+        MOVE.B  #'S',(A3)+  ;move S into the output
+        MOVE.B  #'U',(A3)+  ;move U into the output
+        MOVE.B  #'B',(A3)+  ;move B into the output
+        MOVE.B  #'Q',(A3)+  ;move Q into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
+        JSR     GET_LENGTH  ;get length of add
+        CMP.B   #%00,D3
+        BEQ     SUBQ_BYTE
+        ;else
+        CMP.B   #$01,D3
+        BEQ     SUBQ_WORD
+        ;else
+        CMP.B   #$02,D3
+        BEQ     SUBQ_LONG
+        ;else
+        MOVE.B  $11,D7
+        RTS
     
-SUBQBYTE
-    MOVE.B  #'B',(A3)+
-    BRA     SUBQDONE
+SUBQ_BYTE
+        MOVE.B  #'B',(A3)+
+        BRA     SUBQ_DONE
     
-SUBQWORD
-    MOVE.B  #'W',(A3)+
-    BRA     SUBQDONE
+SUBQ_WORD
+        MOVE.B  #'W',(A3)+
+        BRA     SUBQ_DONE
     
-SUBQLONG
-    MOVE.B  #'L',(A3)+
-    BRA     SUBQDONE
+SUBQ_LONG
+        MOVE.B  #'L',(A3)+
+        BRA     SUBQ_DONE
     
-SUBQDONE
-    MOVE.B  #' ',(A3)+
-    MOVE.B  #'#',(A3)+
-    MOVE.W  D6,D3
-    LSL.W   #4,D3
-    LSR.W   #8,D3
-    LSR.W   #5,D3
-    LSR.W   #6,D3
-    *LEA     REGISTER,A0
-    JSR     00(A0,D3)
-    MOVE.B  #' ',(A3)+
-    *JSR    EACODE
-    RTS
+SUBQ_DONE
+        MOVE.B  #' ',(A3)+
+        MOVE.B  #'#',(A3)+
+        MOVE.W  D6,D3
+        LSL.W   #4,D3
+        LSR.W   #8,D3
+        LSR.W   #5,D3
+        LSR.W   #6,D3
+        *LEA     REGISTER,A0
+        JSR     00(A0,D3)
+        MOVE.B  #' ',(A3)+
+        *JSR    EACODE
+         RTS
 
 **************************************************************************
-GETLENGTH
-    MOVE.B  D6,D3
-    LSR.B   #6,D3
-    RTS
+GET_LENGTH
+        MOVE.B  D6,D3
+        LSR.B   #6,D3
+        RTS
     
 *************************************************************************    
-  
+OPCODE0110
+        MOVE.B  D6,D5
+        LSL.W   #4,D5
+        LSR.W   #8,D5
+        LSR.W   #4,D5
+        CMP.B   #%1110,D5
+        BEQ     BGT_OPCODE
+        ;else
+        CMP.B   #%1111,D5
+        BEQ     BLE_OPCODE
+        ;else
+        CMP.B   #%1001,D5
+        BEQ     BVS_OPCODE
+         ;else
+        MOVE.B  $11,D7
+        RTS 
+    
+BGT_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'G',(A3)+
+        MOVE.B  #'T',(A3)+
+        MOVE.B  #'#',(A3)+
+        *JSR    BCCCODE
+        RTS
+    
+BLE_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'E',(A3)+
+        MOVE.B  #' ',(A3)+
+        *JSR     BCCCODE
+        RTS
+    
+BVS_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'V',(A3)+
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #' ',(A3)+
+
+***********************************************************************
+OPCODE0111
+        MOVE.B  #'M',(A3)+  ;move M into the output
+        MOVE.B  #'O',(A3)+  ;move O into the output
+        MOVE.B  #'V',(A3)+  ;move V into the output
+        MOVE.B  #'E',(A3)+  ;move E into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
+        MOVE.B  #'Q',(A3)+  ;move Q into the output
+        MOVE.B  #' ',(A3)+  ;a space into the output
+        MOVE.B  #'#',(A3)+
+        MOVE.B  #'$',(A3)+
+    
+        MOVE.W  D6,D4
+        MOVEQ   #2,D0
+    
+GET_MSB2
+        ROL.W   #8,D4
+        ROL.W   #4,D4
+        MOVE.L  D4,D5
+        ANDI.L  #$0000000F, D5
+        
+ASCII_CHECK2
+        CMPI.B  #$09,D5
+        BLE     CHAR_TO_NUM
+        ;else
+CHAR_TO_ALPHABET2      
+        ADDI.B  #$37,D5
+        BRA     MOVE_TO_GOOD_DATA
+        
+CHAR_TO_NUM2
+        ADDI.B  #$30,D5
+        BRA     MOVE_TO_GOOD_DATA
+        
+MOVE_TO_GOOD_DATA2
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        ROL.W   #8,D4
+        CMPI.B  #0,D0
+        BGT     GET_MSB2
+        ;else
+        MOVE.W  D6,D5
+        ANDI.W  #$0E00,D5
+        ROR.W   #5,D5
+        ROR.W   #4,D5
+        MULU    #6,D5
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'D',(A3)+
+        *LEA     REGISTER,A0
+        JSR     00(A0,D5)
+        RTS
+
+********************************************************************
+OPCODE1000
+        MOVE.B  #'D',(A3)+  ;move D into the output
+        MOVE.B  #'I',(A3)+  ;move I into the output
+        MOVE.B  #'V',(A3)+  ;move V into the output
+        MOVE.B  #'U',(A3)+  ;move U into the output
+        MOVE.B  #' ',(A3)+  ;move a space into the output
+        *JSR     EACODE
+        MOVE.B  #',',(A3)+  ;move a comma into the output
+        MOVE.B  #'D',(A3)+	;move a D into the output
+        MOVE.W  D6,D3
+        LSL.W   #4,D3
+        LSR.W   #8,D3
+        LSR.W   #5,D3
+        MULU    #6,D3
+        *LEA     REGISTER,A0
+        JSR     00(A0,D3)
+        RTS
+        
+*********************************************************************
+OPCODE1001
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #'U',(A3)+
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'.',(A3)+
+        
+        JSR     GET_LENGTH
+        CMP.B   #%00,D3
+        BEQ     SUB_BYTE
+        ;else
+        CMP.B   #$01,D3
+        BEQ     SUB_WORD
+        ;else
+        CMP.B   #$02,D3
+        BEQ     SUB_LONG
+        ;else
+        MOVE.B  $11,D7
+        RTS
+        
+SUB_BYTE
+        MOVE.B  #'B',(A3)+
+        BRA     SUB_DONE   
+        
+SUB_WORD
+        MOVE.B  #'W',(A3)+
+        BRA     SUB_DONE
+        
+SUB_LONG
+        MOVE.B  #'L',(A3)+
+        BRA     SUB_DONE
+        
+SUB_DONE
+        MOVE.B  #' ',(A3)+
+        MOVE.W  D6,D5
+        LSL.W   #7,D5
+        LSR.W   #8,D5
+        LSR.W   #7,D5
+        *CMP.B   #00,D5 ;ea stuff
+        *BEQ     DNISDEST
+        *CMP.B   #$01,D5
+        *BEQ     EAISDEST
+        MOVE.B  $11,D7
+        RTS
+        
+****************************************************************
+OPCODE1010
+        MOVE.B  $11,D7
+        RTS
+
+****************************************************************
+OPCODE1011
+
 END                
-    SIMHALT             ; halt simulator
+        SIMHALT             ; halt simulator
                
 
 * Put variables and constants here
@@ -439,6 +600,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
