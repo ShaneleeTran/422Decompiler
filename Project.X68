@@ -304,27 +304,118 @@ DSMBLE
         LSR.W   #4, D5
         MULU    #8, D5
         LEA     FIRSTJMP, A0
-        JSR     0(A0,D5) *0(A0,D5)?
+        JSR     0(A0,D5)
         RTS
 
 ****************************************************************************
 FIRSTJMP
         JSR     FIRST0001
         RTS
-        
+
+****************************************************************************        
 FIRST0001
-        MOVE.B  #'M',(A3)+                  Insert M into the output
-        MOVE.B  #'O',(A3)+                  Insert O into the output
-        MOVE.B  #'V',(A3)+                  Insert V into the output
-        MOVE.B  #'E',(A3)+                  Insert E into the output
-        MOVE.B  #'.',(A3)+                  Insert . into the output
-        MOVE.B  #'B',(A3)+                  Insert B into the output
-        MOVE.B  #' ',(A3)+                  Insert a space into the output
-        MOVE.B  #' ',(A3)+                  Insert a space into the output
+        MOVE.B  #'M',(A3)+                  move M into the output
+        MOVE.B  #'O',(A3)+                  move O into the output
+        MOVE.B  #'V',(A3)+                  move V into the output
+        MOVE.B  #'E',(A3)+                  move E into the output
+        MOVE.B  #'.',(A3)+                  move . into the output
+        MOVE.B  #'B',(A3)+                  move B into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
     
         RTS                                 Return the instruction
-
         
+*****************************************************************************
+FIRST0010
+        MOVE.B  #'M',(A3)+                  move M into the output
+        MOVE.B  #'O',(A3)+                  move O into the output
+        MOVE.B  #'V',(A3)+                  move V into the output
+        MOVE.B  #'E',(A3)+                  move E into the output
+        MOVE.B  #'.',(A3)+                  move . into the output
+        MOVE.B  #'L',(A3)+                  move L into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
+        MOVEQ   #1,D1
+        
+        RTS                                 Return the instruction
+
+****************************************************************************
+FIRST0011
+        MOVE.B  #'M',(A3)+                  move M into the output
+        MOVE.B  #'O',(A3)+                  move O into the output
+        MOVE.B  #'V',(A3)+                  move V into the output
+        MOVE.B  #'E',(A3)+                  move E into the output
+        MOVE.B  #'.',(A3)+                  move . into the output
+        MOVE.B  #'W',(A3)+                  move W into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
+        MOVE.B  #' ',(A3)+                  move a space into the output
+        
+        RTS                                 Return the instruction
+
+***************************************************************************
+FIRST0100
+    MOVE.W  D6,D5
+    LSR.W   #$8,D5
+    ANDI.W  #$000F,D5
+    MULU    8,D5
+    *LEA     
+    JSR     00(A0,D5)
+    RTS
+    
+**************************************************************************    
+FIRST0101
+    MOVE.B  #'S',(A3)+  ;move S into the output
+    MOVE.B  #'U',(A3)+  ;move U into the output
+    MOVE.B  #'B',(A3)+  ;move B into the output
+    MOVE.B  #'Q',(A3)+  ;move Q into the output
+    MOVE.B  #'.',(A3)+  ;move . into the output
+    JSR     GETLENGTH   ;get length of add
+    CMP.B   #%00,D3
+    BEQ     SUBQBYTE
+    ;else
+    CMP.B   #$01,D3
+    BEQ     SUBQWORD
+    ;else
+    CMP.B   #$02,D3
+    BEQ     SUBQLONG
+    ;else
+    MOVE.B  $11,D7
+    RTS
+    
+SUBQBYTE
+    MOVE.B  #'B',(A3)+
+    BRA     SUBQDONE
+    
+SUBQWORD
+    MOVE.B  #'W',(A3)+
+    BRA     SUBQDONE
+    
+SUBQLONG
+    MOVE.B  #'L',(A3)+
+    BRA     SUBQDONE
+    
+SUBQDONE
+    MOVE.B  #' ',(A3)+
+    MOVE.B  #'#',(A3)+
+    MOVE.W  D6,D3
+    LSL.W   #4,D3
+    LSR.W   #8,D3
+    LSR.W   #5,D3
+    LSR.W   #6,D3
+    *LEA     REGISTER,A0
+    JSR     00(A0,D3)
+    MOVE.B  #' ',(A3)+
+    *JSR    EACODE
+    RTS
+
+**************************************************************************
+GETLENGTH
+    MOVE.B  D6,D3
+    LSR.B   #6,D3
+    RTS
+    
+*************************************************************************    
+  
 END                
     SIMHALT             ; halt simulator
                
@@ -348,6 +439,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
