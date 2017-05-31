@@ -832,7 +832,46 @@ ADDREG
     JSR     00(A0,D5)
     RTS
 DONEADD
-
+    MOVE.B  #' ',(A3)+
+    MOVE.W  D6,D5
+    LSL.W   #7,D5
+    LSR.W   #8,D5
+    LSR.W   #7,D5
+    BEQ     CHECKDN
+    CMP.B   #$01,D5
+    BEQ     CHECKEA
+    MOVE.B  $11,D7
+    RTS
+    
+CHECKDN
+    *JSR    EACODE
+    MOVE.W  D6,D5
+    LSL.W   #4,D5
+    LSR.W   #8,D5
+    LSR.W   #5,D5
+    MULU    #6,D5
+    MOVE.B  #',',(A3)+
+    MOVE.B  #'D',(A3)+
+    LEA     *REGISTER,A0
+    JSR     00(A0,D5)
+    RTS
+CHECKEA
+    MOVE.W  D6,D5
+    LSL.W   #4,D5
+    LSR.W   #8,D5
+    LSR.W   #5,D5
+    MULU    #6,D5
+    MOVE.B  #'D',(A3)+
+    LEA     *REGISTER,A0
+    JSR     00(A0,D5)
+    MOVE.B  #',',(A3)+
+    *JSR    EACODE
+    RTS
+           
+***********************************
+OPCODE1111
+    MOVE.B  $11,D7
+    RTS    
 
     
     
@@ -861,6 +900,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
