@@ -576,10 +576,271 @@ OPCODE1010
 
 ****************************************************************
 OPCODE1011
+        MOVE.W  D6, D5
+        LSL.W   #7, D5
+        LSR.W   #8, D5
+        LSR.W   #5, D5
+        MULU    #8, D5
+        LEA     OPTABLECONT
+        JSR     0(A0,D5)
+        RTS
+****************************************************************
+****************************************************************              
+OPCODE1100
+        MOVE.W  D6,D5
+        LSL.W   #7,D5
+        LSR.W   #8,D5
+        LSR.W   #5,D5
+        CMP.B   #$07, D5
+        *BEQ    MULSINST
+        MOVE.B  #'A', (A3)+
+        MOVE.B  #'N', (A3)+
+        MOVE.B  #'D', (A3)+
+        MOVE.B  #'.', (A3)+
+        *JSR    GETSIZE
+        CMP.B   #%00, D3
+        BEQ     ANDBYTE
+        CMP.B   #$01, D3
+        BEQ     ANDWORD
+        CMP.B   #$02, D3
+        BEQ     ANDLONG
+        MOVE.B  $11, D7
+        RTS
+ANDBYTE
+        MOVE.B  #'B', (A3)+
+        BRA     ANDEND
+ANDWORD
+        MOVE.B  #'W',(A3)+
+        BRA     ANDEND
+ANDLONG
+        MOVE.B  #'L', (A3)+
+        MOVEQ   #1, D1
+        BRA     ANDEND
+ANDEND
+        MOVE.B  #' ', (A3)+
+        MOVE.W  D6, D5
+        LSL.W   #7, D5
+        LSR.W   #8, D5
+        LSR.W   #7, D5
+        CMP.B   #00, D5
+        *BEQ    DNIDEST
+        CMP.B   #$01, D5
+        *BEQ    EAISDEST
+        MOVE.B  $11, D7
+        RTS
+MULS
+        MOVE.B  #'M',(A3)+
+        MOVE.B  #'U',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #'.',(A3)+
+        MOVE.B  #'W',(A3)+
+        MOVE.B  #' ',(A3)+
+        *JSR EACODE
+        MOVE.W  D6,D5
+        LSL.W   #4,D5
+        LSR.W   #8,D5
+        LSR.W   #5,D5
+        MULU    #6,D5
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'D',(A3)+
+        *LEA    REGISTER,A0
+        JSR     00(A0,D5)
+        RTS
+****************************************************************        
+OPCODE1110
+        MOVE.W  D6,D5
+        LSL.W   #8,D5
+        LSR.W   #6,D5
+        CMP.B   #03,D5
+        *BEQ MEMORYCHECKS
+DECODESHIFT
+        MOVE.W  D6,D5
+        LSL.W   #8,D5
+        LSL.W   #3,D5
+        LSR.W   #8,D5
+        LSR.W   #6,D5
+        CMP.B   #$00, D5
+        BEQ     DISASR
+        CMP.B   #$01, D5
+        BEQ     DISLSL
+        CMP.B   #$03, D5
+        BEQ     DISROL
+        MOVE.B  $11, D7
+        RTS
+DISASR
+        MOVE.W  D6,D5
+        LSL.W   #7,D5
+        LSR.W   #8,D5
+        LSR.W   #7,D5
+        CMP.B   #$00, D5
+        BEQ     DISASRCONT
+        MOVE.B  #11,D7
+        RTS
+DISASRCONT
+        MOVE.B  #'A',(A3)+ 
+        MOVE.B  #'S',(A3)+ 
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'.',(A3)+
+        *JSR    GETSIZE
+        CMP.B   #%00, D3
+        BEQ     SHIFTBYTE
+        CMP.B   #$01, D4
+        BEQ     SHIFTWORD
+        CMP.B   #$02, D4
+        BEQ     SHIFTLONG
+        MOVE.B  $11, D7
+        *JSR    EACODE
+        RTS
+DISLSL
+        MOVE.W  D6,D5
+        LSL.W   #7,D5
+        LSR.W   #8,D5
+        LSR.W   #7,D5
+        BEQ     DISLSLCONT
+        MOVE.B  $11,D7
+        *JSR    EACODE
+        RTS
+DISLSLCONT
+        MOVE.B  #'L',(A3)+ 
+        MOVE.B  #'S',(A3)+ 
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'.',(A3)+
+        *JSR    GETSIZE
+        CMP.B   #%00, D3
+        BEQ     SHIFTBYTE
+        CMP.B   #$01, D4
+        BEQ     SHIFTWORD
+        CMP.B   #$02, D4
+        BEQ     SHIFTLONG
+        MOVE.B  $11, D7
+        *JSR    EACODE
+        RTS   
+SHIFTBYTE
+        MOVE.B  #'B',(A3)+
+        *BRA    GETDATANUMBER
+SHIFTWORD
+        MOVE.B  #'W',(A3)+
+        *BRA    GETDATANUMBER
+SHIFTLONG
+        MOVE.B  #'L',(A3)+
+        *BRA    GETDATANUMBER
+DISROLR
+        MOVE.W  D6,D5
+        LSL.W   #7,D5
+        LSR.W   #8,D5
+        LSR.W   #7,D5
+        CMP.B   #$01,D5
+        BEQ     DISROLRLEFT
+        CMP.B   #$00,D5
+        BEQ     DISRORRIGHT
+        MOVE.B  $11,D7
+        RTS
+DISROLRLEFT
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'O',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'.',(A3)+
+        *JSR GETSIZE
+        CMP.B   #%00,D3
+        BEQ     SHIFTBYTE
+        CMP.B   #%01,D3
+        BEQ     SHIFTWORD
+        CMP.B   #$02,D3
+        BEQ     SHIFTLONG
+        MOVE.B  $11,D7
+        JSR     EACODE
+        RTS
+DISRORRIGHT
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'O',(A3)+
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'.',(A3)+
+        *JSR GETSIZE
+        CMP.B   #%00,D3
+        BEQ     SHIFTBYTE
+        CMP.B   #%01,D3
+        BEQ     SHIFTWORD
+        CMP.B   #$02,D3
+        BEQ     SHIFTLONG
+        MOVE.B  $11,D7
+        JSR     EACODE
+        RTS
+GETDATANUMBER
+        MOVE.W  D6,D3
+        LSL.W   #4,D3
+        LSR.W   #8,D3
+        LSR.W   #5,D3
+************************************************   
+OPCODE1101 *ADD AND ADDA*
+    MOVE.B  #'A',(A3)+
+    MOVE.B  #'D',(A3)+
+    MOVE.B  #'D',(A3)+
+    BRA     ADDA
+ADD
+    MOVE.B  #'.',(A3)+
+    *JSR    GETSIZE
+    CMP.B   #%00, D3
+    BEQ     ADDBYTE
+    CMP.B   #$01, D3
+    BEQ     ADDWORD
+    CMP.B   #$02, D3
+    BEQ     ADDLONG
+    MOVE.B  $11, D7
+    RTS
+ADDBYTE
+    MOVE.B  #'B',(A3)+
+    RTS     DONEADD
+ADDWORD
+    MOVE.B  #'W',(A3)+
+    RTS     DONEADD
+ADDLONG
+    MOVE.B  #'L',(A3)+
+    RTS     DONEADD
+ADDA  
+    MOVE.W  D6,D5
+    LSL.W   #7,D5
+    LSR.W   #8,D5
+    LSR.W   #5,D5
+    CMP.B   #$03, D5
+    BEQ     ADDAW
+    CMP.B   #$07,D5
+    BEQ     ADDALW
+    BRA     ADD
+ADDAW
+    MOVE.B  #'A',(A3)+
+    MOVE.B  #'.',(A3)+
+    MOVE.B  #'W',(A3)+
+    BRA     ADDREG
+ADDALW
+    MOVE.B  #'A',(A3)+
+    MOVE.B  #'.',(A3)+
+    MOVE.B  #'L',(A3)+
+    MOVEQ   #1,D1
+    BRA     ADDREG
+ADDREG
+    MOVE.B  #' ',(A3)+
+    *JSR    EACODE
+    MOVE.B  #',',(A3)+
+    MOVE.B  #'A',(A3)+
+    MOVE.W  D6,D5
+    LSL.W   #4,D5
+    LSR.W   #8,D5
+    LSR.W   #5,D5
+    MULU    #6,D5
+    LEA     REGISTER,A0
+    JSR     00(A0,D5)
+    RTS
+DONEADD
+
+
+    
+    
+ 
 
 END                
         SIMHALT             ; halt simulator
-               
+             
 
 * Put variables and constants here
 CUR_LINE    DS.B    1
@@ -600,6 +861,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
