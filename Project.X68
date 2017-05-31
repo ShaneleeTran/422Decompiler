@@ -309,7 +309,37 @@ DSMBLE
 
 ****************************************************************************
 FIRSTJMP
+        JSR     OPCODE0000
+        RTS
         JSR     OPCODE0001
+        RTS
+        JSR     OPCODE0010
+        RTS
+        JSR     OPCODE0011
+        RTS
+        JSR     OPCODE0100
+        RTS
+        JSR     OPCODE0101
+        RTS
+        JSR     OPCODE0110 *not required
+        RTS
+        JSR     OPCODE0111
+        RTS
+        JSR     OPCODE1000
+        RTS
+        JSR     OPCODE1001
+        RTS
+        JSR     OPCODE1010
+        RTS
+        JSR     OPCODE1011
+        RTS
+        JSR     OPCODE1100
+        RTS
+        JSR     OPCODE1101
+        RTS
+        JSR     OPCODE1110
+        RTS
+        JSR     OPCODE1111
         RTS
 
 ****************************************************************************        
@@ -363,7 +393,7 @@ OPCODE0100
         RTS
     
 **************************************************************************    
-OPCODE0101
+OPCODE0101 ;not required
         MOVE.B  #'S',(A3)+  ;move S into the output
         MOVE.B  #'U',(A3)+  ;move U into the output
         MOVE.B  #'B',(A3)+  ;move B into the output
@@ -415,7 +445,7 @@ GET_LENGTH
         RTS
     
 *************************************************************************    
-OPCODE0110
+OPCODE0110 *not required
         MOVE.B  D6,D5
         LSL.W   #4,D5
         LSR.W   #8,D5
@@ -597,7 +627,7 @@ OPCODE1100
         MOVE.B  #'N', (A3)+
         MOVE.B  #'D', (A3)+
         MOVE.B  #'.', (A3)+
-        *JSR    GETSIZE
+        JSR     GET_LENGTH
         CMP.B   #%00, D3
         BEQ     ANDBYTE
         CMP.B   #$01, D3
@@ -682,7 +712,7 @@ DISASRCONT
         MOVE.B  #'S',(A3)+ 
         MOVE.B  #'R',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR    GETSIZE
+        JSR     GET_LENGTH
         CMP.B   #%00, D3
         BEQ     SHIFTBYTE
         CMP.B   #$01, D4
@@ -706,7 +736,7 @@ DISLSLCONT
         MOVE.B  #'S',(A3)+ 
         MOVE.B  #'L',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR    GETSIZE
+        JSR     GET_LENGTH
         CMP.B   #%00, D3
         BEQ     SHIFTBYTE
         CMP.B   #$01, D4
@@ -741,7 +771,7 @@ DISROLRLEFT
         MOVE.B  #'O',(A3)+
         MOVE.B  #'L',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR GETSIZE
+        JSR     GET_LENGTH
         CMP.B   #%00,D3
         BEQ     SHIFTBYTE
         CMP.B   #%01,D3
@@ -756,7 +786,7 @@ DISRORRIGHT
         MOVE.B  #'O',(A3)+
         MOVE.B  #'R',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR GETSIZE
+        JSR     GET_LENGTH
         CMP.B   #%00,D3
         BEQ     SHIFTBYTE
         CMP.B   #%01,D3
@@ -779,7 +809,7 @@ OPCODE1101 *ADD AND ADDA*
     BRA     ADDA
 ADD
     MOVE.B  #'.',(A3)+
-    *JSR    GETSIZE
+    JSR     GET_LENGTH
     CMP.B   #%00, D3
     BEQ     ADDBYTE
     CMP.B   #$01, D3
@@ -873,9 +903,192 @@ OPCODE1111
     MOVE.B  $11,D7
     RTS    
 
+******************************************************************
+SECONDJMP
+    JSR     0OPCODE0110     ;ADDI
+    RTS
     
+******************************************************************
+0OPCODE0110
+        MOVE.B  #'A',(A3)+  ;move A into the output
+        MOVE.B  #'D',(A3)+  ;move D into the output
+        MOVE.B  #'D',(A3)+  ;move Insert D into the output
+        MOVE.B  #'I',(A3)+  ;move I into the output
+        MOVE.B  #'.',(A3)+  ;move . into the output
     
- 
+        JSR     GET_LENGTH    
+        CMP.B   #%00,D3
+        BEQ     ADDI_BYTE
+        ;else
+        CMP.B   #$01,D3
+        BEQ     ADDI_WORD
+        ;else
+        CMP.B   #$02,D3
+        BEQ     ADDI_LONG
+        ;else
+        MOVE.B  $11,D7
+        RTS
+    
+ADDI_BYTE
+        MOVE.B  #'B',(A3)+
+        MOVE.B	#' ',(A3)+
+        JSR		IMMEDIATE
+        MOVE.B	#',',(A3)+
+        BRA     ADDI_DONE
+        
+ADDI_WORD
+        MOVE.B  #'W',(A3)+
+        MOVE.B	#' ',(A3)+
+ 	    JSR		IMMEDIATE
+ 	    MOVE.B	#',',(A3)+
+        BRA     ADDI_DONE
+
+ADDI_LONG
+        MOVE.B  #'L',(A3)+
+        MOVE.B	#' ',(A3)+
+        MOVEQ   #1,D1
+        JSR     IMMEDIATE
+        MOVE.B	#',',(A3)+
+        BRA     ADDI_DONE
+        
+ADDI_DONE
+        *JSR     EACODE
+        RTS
+
+**********************************************************
+0OPCODE0000
+0OPCODE0100
+0OPCODE1110
+        MOVE.B  $11,D7
+        RTS
+        
+********************************************************** 
+IMMEDIATE
+        MOVE.B  #'#',(A3)+
+        MOVE.B  #'$',(A3)+
+        MOVE.B  #' ',(A4)+
+        MOVE.B  #'#',(A4)+
+        MOVE.B  #'$',(A4)+
+        
+        CMPI.B  #1,D1
+        BEQ     LONG
+        ;else
+        MOVEQ   #4,D0
+        MOVE.W  (A5)+,D4        
+WORD_GET_MSB                
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.L  #$0000000F,D5
+        CMPI.B  #$09,D5
+        BLE     WORD_TO_NUM
+        ;else
+        ADDI.B  #$37,D5
+        BRA     WORD_TO_ASCII
+    
+WORD_TO_NUM
+        ADDI.B  #$30,D5
+        BRA     WORD_TO_ASCII
+
+WORD_TO_ASCII
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     WORD_GET_MSB
+        ;else
+        RTS
+        
+LONG
+        MOVEQ   #8,D0
+        MOVE.L  (A5)+,D4
+LONG_GET_MSB              	
+        ROL.L   #4,D4
+        MOVE.W  D4,D5
+        ANDI.L  #$0000000F,D5
+        CMPI.B  #$09,D5
+        BLE     LONG_TO_NUM
+        ;else
+        ADDI.B  #$37,D5
+        BRA     LONG_TO_ASCII
+        
+LONG_TO_NUM
+        ADDI.B  #$30,D5
+        BRA     LONG_TO_ASCII
+        
+LONG_TO_ASCII
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     LONG_GET_MSB
+        ;else
+        RTS
+
+********************************************************************
+THIRDJMP
+        JSR     1OPCODE0000 ;bad
+        RTS
+        JSR     1OPCODE0001 ;LEA 0
+        RTS
+        JSR     1OPCODE0010 ;not required
+        RTS
+        JSR     1OPCODE0011 ;LEA 1
+        RTS
+        JSR     1OPCODE0100 ;bad
+        RTS
+        JSR     1OPCODE0101 ;LEA 2
+        RTS
+        JSR     1OPCODE0110 ;bad
+        RTS
+        JSR     1OPCODE0111 ;LEA 3
+        RTS
+        JSR     1OPCODE1000 ;MOVEM
+        RTS
+        JSR     1OPCODE1001 ;LEA 3
+        RTS
+        JSR     1OPCODE1010 ;bad
+        RTS
+        JSR     1OPCODE1011 ;LEA 4
+        RTS
+        JSR     1OPCODE1100 ;MOVEM
+        RTS
+        JSR     1OPCODE1101 ;LEA 5
+        RTS
+        JSR     1OPCODE1110 ;JSR
+        RTS
+        JSR     1OPCODE1111 ;LEA 6
+        RTS
+
+*bad
+1OPCODE0000
+1OPCODE0010
+1OPCODE0100
+1OPCODE0110
+1OPCODE1010
+        MOVE.B	$11, D7
+        RTS
+
+******************************************************************
+1OPCODE0000
+        JSR     LEA_ADDPRINT
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'A'(A3)+
+        MOVE.B  #'0',(A3)+
+        RTS
+        
+*****************************************************************
+1OPCODE0011
+        JSR     LEA_ADDPRINT
+        *resume coding here line 1677*
+
+******************************************************************
+LEA_ADDPRINT
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'E',(A3)+
+        MOVE.B  #'A',(A3)+
+        MOVE.B  #' ',(A3)+
+        *JSR     EACODE
+        RTS
 
 END                
         SIMHALT             ; halt simulator
@@ -900,6 +1113,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
