@@ -1628,8 +1628,98 @@ EA111
         JSR    00(A1,D5)
         RTS
 
-*******************************************************      
-       
+******************************************************* 
+ABSOCODE
+       JMP     ABSOCODE000
+       JMP     ABSOCODE001
+       JMP     ABSOCODE010
+       JMP     ABSOCODE011
+       JMP     ABSOCODE100
+
+ABSOCODE000
+       MOVE.B  #'$',(A3)+
+       MOVE.B  #' ',(A4)+
+       MOVE.B  #'$',(A4)+
+       MOVEQ   #4,D0
+       CMPI.B  #1,D7
+       BEQ     WORDABSO
+       BRA     ABSOMOVEW
+WORDABSO
+        MOVEA.L A5,A2
+        ADDA.L  #$2,A2
+        MOVE.W  (A2)+,D4
+        BRA     ABSOCONVERT
+ABSOMOVEW
+        MOVE.W  (A5)+,D4
+ABSOCONVERT
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.W  #$000F,D5
+ABSOASCI
+        CMPI.B  #$09,D5
+        BLE     ABSONUM
+ABSOASCI
+        ADDI.B  #37,D5
+        BRA     ABSOCONVERT2
+ABSONUM
+        ADDI.B  #$30,D5
+        BRA     ABSOCONVERT2
+ABSOCONVERT2
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     ABSOCONVERT
+        MOVEQ   #1,D3
+        RTS
+**********************************
+ABSOCODE001
+       MOVE.B  #'$',(A3)+
+       MOVE.B  #' ',(A4)+
+       MOVE.B  #'$',(A4)+
+       MOVEQ   #8,D0
+       CMPI.B  #1,D7
+       BEQ     LONGABSO
+       BRA     ABSOMOVEL
+LONGABSO
+        MOVEA.L A5,A2
+        ADDA.L  #$2,A2
+        MOVE.W  (A2)+,D4
+        BRA     ABSOCONVERTL
+ABOSMOVEL
+        MOVE.L  (A5)+,D4
+ABSOCONVERTL
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.W  #$0000000F,D5  
+ABSOASCILONG
+        CMPI.B  #$09,D5
+        BLE     ABSONUMLONG
+ABSOLETLONG
+        ADDI.B  #37,D5
+        BRA     ABSOCONVERTLONG
+ABSONUMLONG
+        ADDI.B  #$30,D5
+        BRA     ABSOCONVERTLONG
+ABSOCONVERTLONG
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     ABSOCONVERTL
+        MOVEQ   #2,D3
+        RTS
+********************************
+ABSOCODE010
+        MOVE.B  $11,D7
+        *BRA    GETWORDFORBADDATA
+*********************************
+ABSOCODE011       
+        MOVE.B  $11,D7
+        *BRA    GETWORDFORBADDATA
+*********************************
+ABSOCODE100
+        MOVE.B       
 END                
         SIMHALT             ; halt simulator
              
@@ -1653,6 +1743,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
