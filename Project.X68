@@ -1079,9 +1079,132 @@ THIRDJMP
 *****************************************************************
 1OPCODE0011
         JSR     LEA_ADDPRINT
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'A',(A3)+
+        MOVE.B  #'1',(A3)+
+        RTS
         *resume coding here line 1677*
 
 ******************************************************************
+1OPCODE0010
+        MOVE.B $11,D7
+        RTS
+******************************************************************
+1OPCODE0101
+        JSR     LEA_ADDPRINT
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'A',(A3)+
+        MOVE.B  #'2',(A3)+
+        RTS
+
+******************************************************************
+1OPCODE0110
+        MOVE.B  $11,D7
+        RTS
+
+1OPCODE0111
+        JSR     LEA_ADDPRINT
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'A',(A3)+
+        MOVE.B  #'3',(A3)+
+        RTS
+        
+1OPCODE100
+        MOVE.B  #'M',(A3)+
+        MOVE.B  #'O',(A3)+
+        MOVE.B  #'V',(A3)+
+        MOVE.B  #'E',(A3)+
+        MOVE.B  #'M',(A3)+
+        MOVE.B  #'.',(A3)+
+        *JSR    GETSIZEONEBIT
+        CMP.B   #%0, D3
+        *BEQ    WORDDATAR2M
+        CMP.B   #%1, D3
+        *BEQ    LONGDATAR2M
+        MOVE.B  #$11, D7
+        RTS
+
+LISTFINDER
+        MOVE.B  #' ',(A3)+
+        MOVE.W  (A5)+, D5
+        MOVE.W  D5,D4
+        CLR.B   D1
+        CLR.L   D3
+        MOVE.B  D6,D3
+        ANDI.B  #$38,D3
+        CMPI.B  #$20,D3
+        BEQ     DECREMENT
+REGFINDER
+        LSR.B   #1,D5
+        BCS     DATACONF
+        ADDI.B   #1,D1
+        CMPI.B  #8,D1
+        BEQ     ADDRESSFINDER
+        BRA     REGFINDER
+DATACONF
+        MOVE.B  #'D',(A3)+
+        MOVE.B  D1,D0
+        ADDI.B  #$30,D0
+        MOVE.B  D0,(A3)+
+
+LISTLOOP
+        ADDI.B  #1,D1
+        CMPI.B  #8,D1
+        BEQ     PRINTLIST
+        LSR.B   #1,D5
+        BCS     MOREDATA
+        ADDI.B  #1,D1
+        CMPI.B  #8,D1
+        BEQ     PRINTLIST
+        BRA     LISTLOOP
+PRINTLIST
+        MOVE.B  #'/',(A3)+
+        BRA     REGFINDER
+MOREDATA
+        MOVE.B  #'-',(A3)+
+LISTLOOPCONT
+        MOVE.B  #'D',(A3)+
+        MOVE.B  D1,D0
+        ADDI.B  #$30,D0
+        MOVE.B  D0,(A3)+
+        MOVE.B  #'/',(A3)+
+        MOVEQ   #8,D1
+        BRA     REGFINDER
+REGFINDER
+        LSL.W   #1,D5
+        BCS     REGFOUND
+        SUBI.B  #1,D1
+        CMPI.B  #0,D1
+        BEQ     ENDLSITFINDER
+        BRA     REGFINDER
+REGFOUND
+        MOVE.B  #'A',(A3)+
+        MOVE.B  D1,D0
+        SUBI.B  #1,D0
+        ADDI.B  #$30,D0
+        MOVE.B  D0,(A3)+
+ADDRESSFINDER
+        SUBI.B  #1,D1
+        CMPI.B  #0,D1
+        BEQ     ENDLISTFINDER
+        LSL.W   #1,D5
+        BCS     MOREADDRESS
+        SUBI.B  #1,D1
+        CMPI.B  #0,D1
+        BEQ     ENDLISTFINDER
+        BRA     ADDRESSFINDER
+MOREADDRESS
+        MOVE.B  #'-',(A3)+
+ADDRESSCONT
+        LSL.W   #1,D5
+        BCC     PRINTADDR
+        SUBI.B  #1,D1
+        CMPI.B  #0,D1
+        BEQ     PRINTADDR
+        BRA     ADDRESSCONT
+        
+ 
+
 LEA_ADDPRINT
         MOVE.B  #'L',(A3)+
         MOVE.B  #'E',(A3)+
@@ -1113,6 +1236,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
