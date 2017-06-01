@@ -321,8 +321,8 @@ FIRSTJMP
         RTS
         *JSR     OPCODE0101 *not required SUBQ
         *RTS
-        *JSR     OPCODE0110 *BCC, BLT, BGE
-        *RTS
+        JSR     OPCODE0110 *BCC, BLT, BGE
+        RTS
         JSR     OPCODE0111  *MOVEQ
         RTS
         JSR     OPCODE1000  *DIVU
@@ -400,6 +400,81 @@ OPCODE0100
         MULU    8,D5
         LEA     THIRDJMP,A0
         JSR     00(A0,D5)
+        RTS
+        
+**************************************************************************
+OPCODE0110
+        MOVE.B  D6,D5
+        LSL.W   #4,D5
+        LSR.W   #8,D5
+        LSR.W   #4,D5
+        CMP.B   #%1110,D5
+        BEQ     BGT_OPCODE
+        ;else
+        CMP.B   #%1111,D5
+        BEQ     BLE_OPCODE
+        ;else
+        CMP.B   #%1001,D5
+        BEQ     BVS_OPCODE
+         ;else
+        MOVE.B  $11,D7
+        RTS 
+    
+BGT_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'G',(A3)+
+        MOVE.B  #'T',(A3)+
+        MOVE.B  #'#',(A3)+
+        JSR     BCC_PRINT
+        RTS
+    
+BLE_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'E',(A3)+
+        MOVE.B  #' ',(A3)+
+        JSR     BCC_PRINT
+        RTS
+    
+BVS_OPCODE
+        MOVE.B  #'B',(A3)+
+        MOVE.B  #'V',(A3)+
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #' ',(A3)+
+        
+**********************************************************************
+BCC_PRINT
+        MOVE.W  A5,D5
+        SUB.B   #2,D5
+        MOVE.B  (A5)+,D4
+        ADD.W   #2,D4
+        ADD.W   D4,D5
+        MOVE.B  #'$',(A3)+
+        MOVE.W  D5,D4
+        MOVE.W  #4,D0
+        
+BCC_START
+        ROL.W   #4,D4
+        MOVE.L  D4,D5
+        ANDI.L  #$0000000F,D5
+        
+BCC_NUM_CHECK
+        CMPI.B  #$09,D5
+        BLE     BCC_TO_NUM
+        ;else
+BCC_TO_ALPHABET
+        ADDI.B  #$37,D5
+        BRA     BCC_OUTPUT
+        
+BCC_TO_NUM
+        ADDI.B  #$30,D5
+        BRA     BCC_OUTPUT
+
+BCC_OUTPUT
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        CMPI.B  #0,D0
+        BGT     BCC_START
         RTS
 
 **************************************************************************
@@ -517,12 +592,16 @@ SUB_DONE
         LSR.W   #8,D5
         LSR.W   #7,D5
         *CMP.B   #00,D5 ;ea stuff
-        *BEQ     DNISDEST
+        *BEQ     DST_DN
         *CMP.B   #$01,D5
         *BEQ     EAISDEST
         MOVE.B  $11,D7
         RTS
         
+****************************************************************
+DST_DN
+        *1221*
+
 ****************************************************************
 OPCODE1010
         MOVE.B  $11,D7
@@ -1045,7 +1124,7 @@ OPCODE31000
         MOVE.B  #'E',(A3)+
         MOVE.B  #'M',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR    GETSIZEONEBIT
+        JSR     MSB_LENGTH
         CMP.B   #%0, D3
         BEQ     ENDWORDDATA
         CMP.B   #%1, D3
@@ -1088,7 +1167,7 @@ LISTLOOP
         BRA     LISTLOOP
 PRINTLIST
         MOVE.B  #'/',(A3)+
-        BRA     REGFINDER
+        BRA     ADREGFINDER
 MOREDATA
         MOVE.B  #'-',(A3)+
 LISTDATA
@@ -1105,14 +1184,14 @@ LISTLOOPCONT
         MOVE.B  D0,(A3)+
         MOVE.B  #'/',(A3)+
         MOVEQ   #8,D1
-        BRA     REGFINDER
-REGFINDER
+        BRA     ADREGFINDER
+ADREGFINDER
         LSL.W   #1,D5
         BCS     REGFOUND
         SUBI.B  #1,D1
         CMPI.B  #0,D1
-        *BEQ     ENDLSITFINDER
-        BRA     REGFINDER
+        BEQ     ENDLISTFINDER
+        BRA     ADREGFINDER
 REGFOUND
         MOVE.B  #'A',(A3)+
         MOVE.B  D1,D0
@@ -1260,11 +1339,11 @@ OPCODE31100
         MOVE.B  #'E',(A3)+
         MOVE.B  #'M',(A3)+
         MOVE.B  #'.',(A3)+
-        *JSR    GETSIZEONEBIT
+        JSR     MSB_LENGTH
         CMP.B   #%0, D3
         BEQ     ENDWORDDATA2
         CMP.B   #%1, D3
-        *BEQ     ENDLONGDATA2
+        BEQ     ENDLONGDATA2
         MOVE.B  #$11, D7
         RTS
 MEMREG
@@ -1291,16 +1370,16 @@ DATACONF2
 LISTLOOP2
         ADDI.B  #1,D1
         CMPI.B  #8,D1
-        *BEQ     PRINTLIST2
+        BEQ     PRINTLIST2
         LSR.B   #1,D5
         BCS     MOREDATA2
         ADDI.B  #1,D1
         CMPI.B  #8,D1
-        *BEQ     PRINTLIST2
+        BEQ     PRINTLIST2
         BRA     LISTLOOP2
-PRINTLIST
+PRINTLIST2
         MOVE.B  #'/',(A3)+
-        BRA     REGFINDER
+        BRA     ADREGFINDER2
 MOREDATA2
         MOVE.B  #'-',(A3)+
 LISTDATA2
@@ -1317,14 +1396,14 @@ LISTLOOPCONT2
         MOVE.B  D0,(A3)+
         MOVE.B  #'/',(A3)+
         MOVEQ   #8,D1
-        BRA     REGFINDER2
-REGFINDER2
+        BRA     ADREGFINDER2
+ADREGFINDER2
         LSL.W   #1,D5
         BCS     REGFOUND2
         SUBI.B  #1,D1
         CMPI.B  #0,D1
-        *BEQ     ENDLSITFINDER2
-        BRA     REGFINDER2
+        BEQ     ENDLISTFINDER2
+        BRA     ADREGFINDER2
 REGFOUND2
         MOVE.B  #'A',(A3)+
         MOVE.B  D1,D0
@@ -1381,7 +1460,7 @@ DECREMENTDATA2
         BRA     DECREMENTDATA2
 PRINTDECDATA2
         MOVE.B  #'/',(A3)+
-        *BRA     ADDRESSPREDEC22
+        BRA     ADDRESSPREDEC2
 MOREPREDEC2
         MOVE.B  #'-',(A3)+
 DECREMENTCONT2
@@ -1442,7 +1521,7 @@ PRINTADDPREDEC2
 ENDWORDDATA2
         MOVE.B  #'W',(A3)+
         BRA     MEMREG
-ENDLONGDATA
+ENDLONGDATA2
         MOVE.B  #'L',(A3)+
         BRA     MEMREG
 ENDLISTFINDER2
@@ -1460,7 +1539,13 @@ LONGPLUS
 FINISHLIST
         RTS
         
-********************************************************     
+********************************************************
+MSB_LENGTH
+        MOVE.B  D6,D3
+        LSR.B   #6,D3
+        RTS
+        
+*******************************************************    
 OPCODE31101
         JSR     LEA_ADDPRINT
         MOVE.B  #',',(A3)+
@@ -1658,7 +1743,7 @@ ABSOCONVERT
 ABSOASCI
         CMPI.B  #$09,D5
         BLE     ABSONUM
-ABSOASCI
+ABSOLET
         ADDI.B  #37,D5
         BRA     ABSOCONVERT2
 ABSONUM
@@ -1686,7 +1771,7 @@ LONGABSO
         ADDA.L  #$2,A2
         MOVE.W  (A2)+,D4
         BRA     ABSOCONVERTL
-ABOSMOVEL
+ABSOMOVEL
         MOVE.L  (A5)+,D4
 ABSOCONVERTL
         ROL.W   #4,D4
@@ -1743,6 +1828,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
