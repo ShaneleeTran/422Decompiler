@@ -1804,7 +1804,68 @@ ABSOCODE011
         *BRA    GETWORDFORBADDATA
 *********************************
 ABSOCODE100
-        MOVE.B       
+        MOVE.B  #'#',(A3)+
+        MOVE.B  #'$',(A3)+
+        MOVE.B  #' ',(A4)+ 
+        MOVE.B  #'#',(A4)+
+        MOVE.B  #'$',(A4)+
+        CMPI.B  #1,D1
+        BEQ     LWBRANCH
+DATAW
+        MOVEQ   #4,D0
+        MOVE.W  (A5)+,D4
+DATAWCONT
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.L  #$0000000F,D5
+DATAWCONV
+        CMPI.B  #$09,D5     
+        BLE     DATAWNUM
+DATAWLETTER
+        ADDI.B  #$37,D5
+        BRA     DATAWCH
+DATAWNUM
+        ADDI.B  #$30,D5
+        BRA     DATAWCH
+DATAWCH
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     DATAWCONT
+        RTS
+LDATAW
+        MOVEQ   #8,D0
+        MOVE.L  (A5)+,D4
+LDATAWCONT
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.L  #$0000000F,D5
+LDATAWCONV
+        CMPI.B  #$09,D5
+        BLE     LDATAWNUM
+LDATAWLETTER
+        ADDI.B  #$37,D5
+        BRA     LDATAWCHAR
+LDATAWNUM
+        ADDI.B  #$30,D5
+        BRA     LDATAWCHAR
+LDATAWCHAR
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A3)+
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     LDATAWCONT
+        RTS
+FINISHED
+        LEA     FINISH_MSG,A1
+        MOVEQ   #14,D0
+        TRAP    #15
+  
+
+        
+        
+        
 END                
         SIMHALT             ; halt simulator
              
@@ -1828,6 +1889,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
