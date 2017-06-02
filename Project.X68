@@ -252,41 +252,67 @@ BAD
 *BAD_GET
         MOVEQ   #4,D0
         MOVE.W  D6,D4
-        
-ADDRPRNT
-        MOVEQ   #8, D0
-        MOVE.L  A5, D4
-        SUB.B   #2, D4
 
 GET_MSB
         ROL.L   #4,D4
         MOVE.L  D4,D5
         ANDI.L  #$0000000F, D5
-        
+
 ASCII_CHECK
         CMPI.B #$09,D5
         BLE     CHAR_TO_NUM
         ;else
+
 CHAR_TO_ALPHABET        
         ADDI.B  #$37,D5
-        BRA     MOVE_TO_GOOD_DATA
-        
+        BRA     MOVE_TO_BAD_DATA
+
 CHAR_TO_NUM
         ADDI.B  #$30,D5
-        BRA     MOVE_TO_GOOD_DATA
+        BRA     MOVE_TO_BAD_DATA
+
+MOVE_TO_BAD_DATA
+        SUBI.B  #1,D0
+        MOVE.B  D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     GET_MSB
+        RTS
         
-MOVE_TO_GOOD_DATA
+***************************************************************************        
+ADDRPRNT
+        MOVEQ   #8, D0
+        MOVE.L  A5, D4
+        SUB.B   #2, D4
+
+GET_MSB1
+        ROL.L   #4,D4
+        MOVE.L  D4,D5
+        ANDI.L  #$0000000F, D5
+
+ASCII_CHECK1
+        CMPI.B #$09,D5
+        BLE     CHAR_TO_NUM1
+        ;else
+
+CHAR_TO_ALPHABET1       
+        ADDI.B  #$37,D5
+        BRA     MOVE_TO_GOOD_DATA1
+
+CHAR_TO_NUM1
+        ADDI.B  #$30,D5
+        BRA     MOVE_TO_GOOD_DATA1
+
+MOVE_TO_GOOD_DATA1
         SUBI.B  #1,D0
         MOVE.B  D5,(A3)+
         MOVE.B  D5,(A4)+
         CMPI.B  #0,D0
-        BGT     GET_MSB
+        BGT     GET_MSB1
         MOVE.B  #$20,(A3)+
         MOVE.B  #$20,(A3)+
         MOVE.B  #$20,(A4)+
         MOVE.B  #$20,(A4)+
-        RTS
-        
+        RTS        
 ***************************************************************************
 BAD_PRINT
         MOVE.B  #$00,(A4)+
@@ -510,11 +536,11 @@ ASCII_CHECK2
         ;else
 CHAR_TO_ALPHABET2      
         ADDI.B  #$37,D5
-        BRA     MOVE_TO_GOOD_DATA
+        BRA     MOVE_TO_GOOD_DATA2
         
 CHAR_TO_NUM2
         ADDI.B  #$30,D5
-        BRA     MOVE_TO_GOOD_DATA
+        BRA     MOVE_TO_GOOD_DATA2
         
 MOVE_TO_GOOD_DATA2
         SUBI.B  #1,D0
@@ -2045,6 +2071,7 @@ GOODDATA DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
