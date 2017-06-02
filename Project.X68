@@ -319,9 +319,9 @@ FIRSTJMP
         RTS
         JSR     OPCODE0100  *JSR LEA MOVEM RTS
         RTS
-        *JSR     OPCODE0101 *not required SUBQ
-        *RTS
-        JSR     OPCODE0110 *BCC, BLT, BGE
+        JSR     OPCODE0101 *not required SUBQ
+        RTS
+        JSR     OPCODE0110  *BCC, BLT, BGE
         RTS
         JSR     OPCODE0111  *MOVEQ
         RTS
@@ -591,31 +591,46 @@ SUB_DONE
         LSL.W   #7,D5
         LSR.W   #8,D5
         LSR.W   #7,D5
-        *CMP.B   #00,D5 ;ea stuff
-        *BEQ     DST_DN
-        *CMP.B   #$01,D5
-        *BEQ     EAISDEST
+        CMP.B   #00,D5
+        BEQ     DST_DN
+        CMP.B   #$01,D5
+        BEQ     DST_EA
         MOVE.B  $11,D7
         RTS
         
 ****************************************************************
 DST_DN
-        *1221*
+        JSR     EA_GET
+        MOVE.W  D6, D5
+        LSL.W   #4, D5
+        LSR.W   #8, D5
+        LSR.W   #5, D5
+        MULU    #6, D5
+        MOVE.B  #',',(A3)+
+        MOVE.B  #'D',(A3)+
+        LEA     REG_NUM,A0
+        JSR     00(A0,D5)
+        RTS
+        
+****************************************************************
+DST_EA 
+        MOVE.W  D6, D5
+        LSL.W   #4, D5
+        LSR.W   #8, D5
+        LSR.W   #5, D5
+        MULU    #6, D5
+        MOVE.B  #'D',(A3)+
+        LEA     REG_NUM,A0
+        JSR     00(A0,D5)
+        MOVE.B  #',',(A3)+
+        JSR     EA_GET
+        RTS 
 
 ****************************************************************
 OPCODE1010
-        MOVE.B  $11,D7
-        RTS
-
-****************************************************************
 OPCODE1011
-        MOVE.W  D6, D5
-        LSL.W   #7, D5
-        LSR.W   #8, D5
-        LSR.W   #5, D5
-        MULU    #8, D5
-        *LEA     OPTABLECONT,A0
-        JSR     0(A0,D5)
+OPCODE0101
+        MOVE.B  $11,D7
         RTS
         
 ****************************************************************              
@@ -625,7 +640,7 @@ OPCODE1100
         LSR.W   #8,D5
         LSR.W   #5,D5
         CMP.B   #$07, D5
-        *BEQ    MULSINST
+        BEQ     MULS_PRINT
         MOVE.B  #'A',(A3)+
         MOVE.B  #'N',(A3)+
         MOVE.B  #'D',(A3)+
@@ -656,12 +671,14 @@ ANDEND
         LSR.W   #8,D5
         LSR.W   #7,D5
         CMP.B   #00,D5
-        *BEQ    DNIDEST
+        BEQ     DST_DN
         CMP.B   #$01,D5
-        *BEQ    EAISDEST
+        BEQ     DST_EA
         MOVE.B  $11, D7
         RTS
-MULS
+        
+*******************************************************************        
+MULS_PRINT
         MOVE.B  #'M',(A3)+
         MOVE.B  #'U',(A3)+
         MOVE.B  #'L',(A3)+
@@ -687,7 +704,8 @@ OPCODE1110
         LSL.W   #8,D5
         LSR.W   #6,D5
         CMP.B   #03,D5
-        *BEQ MEMORYCHECKS
+        BEQ     SHIFT_MEM_CHECK
+        ;else
 DECODESHIFT
         MOVE.W  D6,D5
         LSL.W   #8,D5
@@ -699,9 +717,10 @@ DECODESHIFT
         CMP.B   #$01, D5
         BEQ     DISLSL
         CMP.B   #$03, D5
-        *BEQ     DISROL
+        BEQ     DISROLR
         MOVE.B  $11, D7
         RTS
+        
 DISASR
         MOVE.W  D6,D5
         LSL.W   #7,D5
@@ -711,6 +730,7 @@ DISASR
         BEQ     DISASRCONT
         MOVE.B  #11,D7
         RTS
+        
 DISASRCONT
         MOVE.B  #'A',(A3)+ 
         MOVE.B  #'S',(A3)+ 
@@ -726,6 +746,7 @@ DISASRCONT
         MOVE.B  $11,D7
         JSR     EA_GET
         RTS
+        
 DISLSL
         MOVE.W  D6,D5
         LSL.W   #7,D5
@@ -735,6 +756,7 @@ DISLSL
         MOVE.B  $11,D7
         JSR     EA_GET
         RTS
+        
 DISLSLCONT
         MOVE.B  #'L',(A3)+ 
         MOVE.B  #'S',(A3)+ 
@@ -749,16 +771,17 @@ DISLSLCONT
         BEQ     SHIFTLONG
         MOVE.B  $11, D7
         JSR     EA_GET
-        RTS   
+        RTS
+   
 SHIFTBYTE
         MOVE.B  #'B',(A3)+
-        *BRA    GETDATANUMBER
+        BRA     SHIFT_PRINT_EA
 SHIFTWORD
         MOVE.B  #'W',(A3)+
-        *BRA    GETDATANUMBER
+        BRA     SHIFT_PRINT_EA
 SHIFTLONG
         MOVE.B  #'L',(A3)+
-        *BRA    GETDATANUMBER
+        BRA     SHIFT_PRINT_EA
 DISROLR
         MOVE.W  D6,D5
         LSL.W   #7,D5
@@ -770,6 +793,7 @@ DISROLR
         BEQ     DISRORRIGHT
         MOVE.B  $11,D7
         RTS
+        
 DISROLRLEFT
         MOVE.B  #'R',(A3)+
         MOVE.B  #'O',(A3)+
@@ -785,6 +809,7 @@ DISROLRLEFT
         MOVE.B  $11,D7
         JSR     EA_GET
         RTS
+        
 DISRORRIGHT
         MOVE.B  #'R',(A3)+
         MOVE.B  #'O',(A3)+
@@ -800,13 +825,108 @@ DISRORRIGHT
         MOVE.B  $11,D7
         JSR     EA_GET
         RTS
-GETDATANUMBER
+        
+SHIFT_PRINT_EA
         MOVE.W  D6,D3
         LSL.W   #4,D3
         LSR.W   #8,D3
         LSR.W   #5,D3
+
+SHIFT_IR_CHECK
+        MOVE.B  #' ',(A3)+ 
+        MOVE.W  D6, D5 
+        LSL.W   #8,D5
+        LSL.W   #2,D5
+        LSR.W   #8,D5
+        LSR.W   #7,D5
+        CMP.B   #$00, D5
+        BEQ     IR0
+        CMP.B   #$01, D5
+        BEQ     IR1         
+        ;else
+        MOVE.B  $11, D7
+        RTS 
         
-************************************************   
+IR0
+        MULU    #6, D3
+        MOVE.B  #'#',(A3)+
+        LEA     REG_NUM,A0
+        JSR     00(A0,D3)
+        MOVE.B  #',',(A3)+
+        JSR     LAST_3_BITS
+        MOVE.B  #'D',(A3)+ 
+        MULU    #6,D3 
+        LEA     REG_NUM,A0
+        JSR     00(A0,D3)
+        RTS
+        
+IR1
+        MULU    #6, D3 
+        MOVE.B  #'D',(A3)+ 
+        LEA     REG_NUM,A0
+        JSR     00(A0,D3)
+        MOVE.B  #',',(A3)+
+        JSR     LAST_3_BITS
+        MOVE.B  #'D',(A3)+
+        MULU    #6,D3
+        LEA     REG_NUM,A0
+        JSR     00(A0,D3)
+        RTS
+        
+************************************************************
+LAST_3_BITS
+        MOVE.B  D6,D3
+        LSL.B   #5,D3
+        LSR.B   #5,D3
+        RTS
+
+*************************************************************
+SHIFT_MEM_CHECK
+        MOVE.W  D6, D5
+        LSR.W   #6, D5               
+        CMP.W   #$038F, D5                   
+        BEQ     LOG_LEFT_SHIFT_MEM
+        CMP.W   #$0383, D5                 
+        BEQ     AR_RIGHT_SHIFT_MEM                 
+        CMP.W   #$039F, D5                   
+        BEQ     ROTATE_LEFT_MEM                   
+        CMP.W   #$039B, D5                      
+        BEQ     ROTATE_RIGHT_MEM                    
+        BRA		DECODESHIFT
+
+LOG_LEFT_SHIFT_MEM
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #' ',(A3)+
+        BRA     MEM_SHIFT_DONE
+        
+AR_RIGHT_SHIFT_MEM
+        MOVE.B  #'A',(A3)+
+        MOVE.B  #'S',(A3)+
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #' ',(A3)+
+        BRA     MEM_SHIFT_DONE
+
+ROTATE_RIGHT_MEM
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'O',(A3)+
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #' ',(A3)+
+        BRA     MEM_SHIFT_DONE
+
+ROTATE_LEFT_MEM
+        MOVE.B  #'R',(A3)+
+        MOVE.B  #'O',(A3)+
+        MOVE.B  #'L',(A3)+
+        MOVE.B  #' ',(A3)+
+        BRA     MEM_SHIFT_DONE
+
+MEM_SHIFT_DONE
+        JSR     EA_GET
+        RTS
+
+*************************************************************
 OPCODE1101 *ADD AND ADDA*
         MOVE.B  #'A',(A3)+
         MOVE.B  #'D',(A3)+
@@ -910,7 +1030,7 @@ CHECKEA
         JSR     EA_GET
         RTS
            
-***********************************
+*****************************************************************
 OPCODE1111
         MOVE.B  $11,D7
         RTS    
@@ -1701,7 +1821,7 @@ EA100
         RTS
 EA101
         MOVE.B  $11, D7
-        *BRA    GETWORDFORBADDATA	
+        BRA    BAD_DATA_PRINT_W	
 
 EA110
         MOVE.B  $11, D7
@@ -1709,7 +1829,7 @@ EA110
 
 EA111
         MULU   #$6,D5
-        *LEA    ABSOLUTE,A1
+        LEA    ABSOCODE,A1
         JSR    00(A1,D5)
         RTS
 
@@ -1757,7 +1877,8 @@ ABSOCONVERT2
         BGT     ABSOCONVERT
         MOVEQ   #1,D3
         RTS
-**********************************
+        
+****************************************************
 ABSOCODE001
        MOVE.B  #'$',(A3)+
        MOVE.B  #' ',(A4)+
@@ -1794,15 +1915,50 @@ ABSOCONVERTLONG
         BGT     ABSOCONVERTL
         MOVEQ   #2,D3
         RTS
-********************************
+        
+***********************************************************
 ABSOCODE010
         MOVE.B  $11,D7
-        *BRA    GETWORDFORBADDATA
-*********************************
+        BRA    BAD_DATA_PRINT_W
+        
+***********************************************************
 ABSOCODE011       
         MOVE.B  $11,D7
-        *BRA    GETWORDFORBADDATA
-*********************************
+        BRA    BAD_DATA_PRINT_W
+        
+***********************************************************
+BAD_DATA_PRINT_W
+        MOVE.B  #' ',(A4)+
+        MOVE.B	#'$',(A4)+
+        MOVEQ   #4,D0
+        MOVE.W  (A5)+,D4
+        
+MSB_LONG_GET                
+        ROL.W   #4,D4
+        MOVE.W  D4,D5
+        ANDI.L  #$0000000F,D5
+        
+BDL_ASCII_CHECK
+        CMPI.B  #$09,D5
+        BLE     BDL_TO_NUM 
+        ;else
+BDL_TO_ALPHABET
+        ADDI.B  #$37,D5
+        BRA     BDL_PRINT
+        
+BDL_TO_NUM
+        ADDI.B  #$30,D5
+        BRA     BDL_PRINT
+        
+BDL_PRINT
+        SUBI.B  #1,D0
+        MOVE.B	D5,(A4)+
+        CMPI.B  #0,D0
+        BGT     MSB_LONG_GET
+        RTS
+
+
+***********************************************************
 ABSOCODE100
         MOVE.B  #'#',(A3)+
         MOVE.B  #'$',(A3)+
@@ -1810,7 +1966,7 @@ ABSOCODE100
         MOVE.B  #'#',(A4)+
         MOVE.B  #'$',(A4)+
         CMPI.B  #1,D1
-        BEQ     LWBRANCH
+        BEQ     LDATAW
 DATAW
         MOVEQ   #4,D0
         MOVE.W  (A5)+,D4
@@ -1882,13 +2038,14 @@ BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
 BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
 BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
 WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
-TEST_MSG    DC.B    CR,LF,'you made it',0
+FINISH_MSG    DC.B    CR,LF,'END',0
 BADDATA DC.L 1
 GOODDATA DC.L 1
 
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
