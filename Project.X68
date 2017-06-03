@@ -452,7 +452,7 @@ OPCODE0100
         MOVE.W  D6,D5
         LSR.W   #$8,D5
         ANDI.W  #$000F,D5
-        MULU    8,D5
+        MULU    #8,D5
         LEA     THIRDJMP,A0
         JSR     00(A0,D5)
         RTS
@@ -2077,7 +2077,9 @@ FINISHED
         
         
         
-END                
+END     
+        BRA     CONT_INPUT
+           
         SIMHALT             ; halt simulator
              
 
@@ -2092,7 +2094,7 @@ BAD_INPUT_MSG   DC.B    CR,LF,'Invalid address',0
 BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
 BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
 BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
-WAIT_MSG            DC.B    CR,LF,'Press any key to continue',0
+WAIT_MSG            DC.B    CR,LF,'Press any key to continue',CR,LF,0
 ENTER_TO_CONT_MSG   DC.B    CR,LF,'Press enter to continue',0
 FINISH_MSG      DC.B    CR,LF,'END',0
 BADDATA         DC.L 1
@@ -2101,6 +2103,8 @@ GOODDATA        DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
+
 
 
 
