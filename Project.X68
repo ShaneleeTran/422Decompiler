@@ -215,16 +215,16 @@ CONT_INPUT
 
 ****************************************************************************
 MAIN_LOOP     
-        MOVE.W   (A5)+, D6
-        LEA     GOODDATA, A3
-        LEA     BADDATA, A4
+        MOVE.W  (A5)+,D6
+        LEA     GOODDATA,A3
+        LEA     BADDATA,A4
         JSR     ADDRPRNT
         JSR     BAD
         JSR     DSMBLE
         CMP.B   $FF,D7
         BEQ     BAD_PRINT
-        MOVE.B  #$00, (A3)+
-        LEA     GOODDATA, A1
+        MOVE.B  #$00,(A3)+
+        LEA     GOODDATA,A1
         MOVEQ   #13,D0
         TRAP    #15
 END_LOOP
@@ -232,34 +232,35 @@ END_LOOP
         BEQ     END
         CMP.W   A6,A5
         BGT     END
-        ADD.B   #1, CUR_LINE
-        CMP.B   #29, CUR_LINE
+        ADD.B   #1,CUR_LINE
+        CMP.B   #29,CUR_LINE
+        BEQ     WAIT_FOR_USER
         BRA     MAIN_LOOP
 ****************************************************************************
 
 BAD
-        MOVE.B	#'B',(A4)+			Insert B into the output
-        MOVE.B	#'A',(A4)+			Insert A into the output
-        MOVE.B	#'D',(A4)+			Insert D into the output
-        MOVE.B	#' ',(A4)+			Insert a space into the output
-        MOVE.B	#'D',(A4)+			Insert D into output
-        MOVE.B	#'A',(A4)+			Insert A into output
-        MOVE.B	#'T',(A4)+			Insert T into output
-        MOVE.B	#'A',(A4)+			Insert A into output
-        MOVE.B	#' ',(A4)+			Insert a space into output
-        MOVE.B #'$',(A4)+           Insert a $ into output
+        MOVE.B	#'B',(A4)+	
+        MOVE.B	#'A',(A4)+		
+        MOVE.B	#'D',(A4)+		
+        MOVE.B	#' ',(A4)+			
+        MOVE.B	#'D',(A4)+			
+        MOVE.B	#'A',(A4)+			
+        MOVE.B	#'T',(A4)+		
+        MOVE.B	#'A',(A4)+		
+        MOVE.B	#' ',(A4)+			
+        MOVE.B #'$',(A4)+      
         
 *BAD_GET
         MOVEQ   #4,D0
         MOVE.W  D6,D4
 
 GET_MSB
-        ROL.L   #4,D4
+        ROL.W   #4,D4
         MOVE.L  D4,D5
-        ANDI.L  #$0000000F, D5
+        ANDI.L  #$0000000F,D5
 
 ASCII_CHECK
-        CMPI.B #$09,D5
+        CMPI.B  #$09,D5
         BLE     CHAR_TO_NUM
         ;else
 
@@ -277,20 +278,48 @@ MOVE_TO_BAD_DATA
         CMPI.B  #0,D0
         BGT     GET_MSB
         RTS
+
+***************************************************************************
+WAIT_FOR_USER
+        MOVEQ   #13,D0
+        MOVE.B  #$00,CUR_LINE
+        LEA     ENTER_TO_CONT_MSG,A1
+        MOVE.B  #13, D0
+        TRAP    #15
+        BRA     GET_KEY
         
-***************************************************************************        
+***************************************************************************
+GET_KEY
+        MOVE.B  #12,D0
+        MOVE.B  #0,D1
+        TRAP    #15 
+        MOVE.B  #5,D0 
+        TRAP    #15
+        CMP.B   #$D,D1
+        BEQ     START_MAIN_LOOP
+        ;else
+        BRA     END
+
+***************************************************************************
+START_MAIN_LOOP
+        MOVE.B  #11,D0
+        MOVE.W  #$FF00,D1
+        TRAP    #15
+        BRA     MAIN_LOOP
+
+***************************************************************************       
 ADDRPRNT
-        MOVEQ   #8, D0
-        MOVE.L  A5, D4
-        SUB.B   #2, D4
+        MOVEQ   #8,D0
+        MOVE.L  A5,D4
+        SUB.B   #2,D4
 
 GET_MSB1
         ROL.L   #4,D4
         MOVE.L  D4,D5
-        ANDI.L  #$0000000F, D5
+        ANDI.L  #$0000000F,D5
 
 ASCII_CHECK1
-        CMPI.B #$09,D5
+        CMPI.B  #$09,D5
         BLE     CHAR_TO_NUM1
         ;else
 
@@ -326,9 +355,9 @@ BAD_PRINT
 DSMBLE  
         CLR.B   D1
         MOVE.W  D6,D5
-        LSR.W   #8, D5
-        LSR.W   #4, D5
-        MULU    #8, D5
+        LSR.W   #8,D5
+        LSR.W   #4,D5
+        MULU    #8,D5
         LEA     FIRSTJMP,A0
         JSR     0(A0,D5)
         RTS
@@ -345,7 +374,7 @@ FIRSTJMP
         RTS
         JSR     OPCODE0100  *JSR LEA MOVEM RTS
         RTS
-        JSR     OPCODE0101 *not required SUBQ
+        JSR     OPCODE0101  *not required SUBQ
         RTS
         JSR     OPCODE0110  *BCC, BLT, BGE
         RTS
@@ -2053,24 +2082,26 @@ END
              
 
 * Put variables and constants here
-CUR_LINE    DS.B    1
-STRT_INPUT  DS.B    80
-END_INPUT   DS.B    80
-WELCOME_MSG DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
+CUR_LINE        DS.B    1
+STRT_INPUT      DS.B    80
+END_INPUT       DS.B    80
+WELCOME_MSG     DC.B    'Shanelee Tran and Tyler Do Disassembler',CR,LF,0
 USR_STRT_MSG    DC.B    CR,LF,'Enter starting address: ',0
-USR_END_MSG    DC.B    CR,LF,'Enter ending address: ',0
+USR_END_MSG     DC.B    CR,LF,'Enter ending address: ',0
 BAD_INPUT_MSG   DC.B    CR,LF,'Invalid address',0
 BAD_INPUT_ODD_MSG   DC.B    CR,LF,'Invalid address, no odd addresses allowed',0
 BAD_INPUT_LOW_MSG   DC.B    CR,LF,'Invalid address, too low',0
 BAD_INPUT_HIGH_MSG  DC.B    CR,LF,'Invalid address, too high',0
-WAIT_MSG    DC.B    CR,LF,'Press any key to continue',0
-FINISH_MSG    DC.B    CR,LF,'END',0
-BADDATA DC.L 1
-GOODDATA DC.L 1
+WAIT_MSG            DC.B    CR,LF,'Press any key to continue',0
+ENTER_TO_CONT_MSG   DC.B    CR,LF,'Press enter to continue',0
+FINISH_MSG      DC.B    CR,LF,'END',0
+BADDATA         DC.L 1
+GOODDATA        DC.L 1
 
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
