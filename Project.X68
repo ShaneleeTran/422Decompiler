@@ -757,6 +757,7 @@ MULS_PRINT
 OPCODE1110
         MOVE.W  D6,D5
         LSL.W   #8,D5
+        LSR.W   #8,D5
         LSR.W   #6,D5
         CMP.B   #03,D5
         BEQ     SHIFT_MEM_CHECK
@@ -767,11 +768,11 @@ DECODESHIFT
         LSL.W   #3,D5
         LSR.W   #8,D5
         LSR.W   #6,D5
-        CMP.B   #$00, D5
+        CMP.B   #$00,D5
         BEQ     DISASR
         CMP.B   #$01, D5
         BEQ     DISLSL
-        CMP.B   #$03, D5
+        CMP.B   #$03,D5
         BEQ     DISROLR
         MOVE.B  $11, D7
         RTS
@@ -781,7 +782,7 @@ DISASR
         LSL.W   #7,D5
         LSR.W   #8,D5
         LSR.W   #7,D5
-        CMP.B   #$00, D5
+        CMP.B   #$00,D5
         BEQ     DISASRCONT
         MOVE.B  #11,D7
         RTS
@@ -807,6 +808,7 @@ DISLSL
         LSL.W   #7,D5
         LSR.W   #8,D5
         LSR.W   #7,D5
+        CMP.B   #$01,D5
         BEQ     DISLSLCONT
         MOVE.B  $11,D7
         JSR     EA_GET
@@ -2146,6 +2148,7 @@ GOODDATA        DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
