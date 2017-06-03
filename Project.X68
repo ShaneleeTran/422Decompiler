@@ -1002,15 +1002,15 @@ ADD
         
 ADDBYTE
         MOVE.B  #'B',(A3)+
-        RTS     DONEADD
+        BRA     DONEADD
         
 ADDWORD
         MOVE.B  #'W',(A3)+
-        RTS     DONEADD
+        BRA     DONEADD
         
 ADDLONG
         MOVE.B  #'L',(A3)+
-        RTS     DONEADD
+        BRA     DONEADD
         
 ADDA  
         MOVE.W  D6,D5
@@ -1300,16 +1300,16 @@ OPCODE31000
         MOVE.B  #'M',(A3)+
         MOVE.B  #'.',(A3)+
         JSR     MSB_LENGTH
-        CMP.B   #%0, D3
+        CMP.B   #%0,D3
         BEQ     ENDWORDDATA
-        CMP.B   #%1, D3
+        CMP.B   #%1,D3
         BEQ     ENDLONGDATA
-        MOVE.B  #$11, D7
+        MOVE.B  #$11,D7
         RTS
 
 LISTFINDER
         MOVE.B  #' ',(A3)+
-        MOVE.W  (A5)+, D5
+        MOVE.W  (A5)+,D5
         MOVE.W  D5,D4
         CLR.B   D1
         CLR.L   D3
@@ -1717,7 +1717,8 @@ FINISHLIST
 ********************************************************
 MSB_LENGTH
         MOVE.B  D6,D3
-        LSR.B   #6,D3
+        LSL.B   #1,D3
+        LSR.B   #7,D3
         RTS
         
 *******************************************************    
