@@ -417,7 +417,7 @@ OPCODE0001
         MOVE.B  #'B',(A3)+  ;move B into the output
         MOVE.B  #' ',(A3)+  ;move a space into the output
         MOVE.B  #' ',(A3)+  ;move a space into the output
-    
+        JSR     MOVE_EA_GET
         RTS
         
 *****************************************************************************
@@ -431,7 +431,7 @@ OPCODE0010
         MOVE.B  #' ',(A3)+  ;move a space into the output
         MOVE.B  #' ',(A3)+  ;move a space into the output
         MOVEQ   #1,D1
-        
+        JSR     MOVE_EA_GET
         RTS
 
 ****************************************************************************
@@ -444,7 +444,7 @@ OPCODE0011
         MOVE.B  #'W',(A3)+  ;move W into the output
         MOVE.B  #' ',(A3)+  ;move a space into the output
         MOVE.B  #' ',(A3)+  ;move a space into the output
-        
+        JSR     MOVE_EA_GET
         RTS
 
 ***************************************************************************
@@ -1807,6 +1807,32 @@ REG111
         RTS
         
 **********************************************************
+MOVE_EA_GET
+        CLR.W  D4
+        MOVE.B D6,D5
+        MOVE.B D6,D4
+        ANDI.B #$07,D5
+        LSR.B  #3,D4
+        ANDI.B #$07,D4
+        MULU   #$6,D4
+        LEA    EA_TABLE,A0
+        JSR    00(A0,D4)    
+        MOVE.B  #',',(A3)+
+        CLR.W  D4
+        MOVE.W D6,D5
+        MOVE.W D6,D4
+        LSR.W  #4,D5
+        LSR.W  #5,D5
+        ANDI.B #$07,D5
+        LSR.W  #6,D4
+        ANDI.B #$07,D4
+        MULU   #$6,D4
+        LEA    EA_TABLE,A0
+        JSR    00(A0,D4)
+        RTS
+        
+        
+**********************************************************
 EA_GET
         CLR.W   D4
         CLR.W   D5
@@ -2119,6 +2145,7 @@ GOODDATA        DC.L 1
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 
