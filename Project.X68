@@ -250,7 +250,7 @@ BAD
         MOVE.B	#' ',(A4)+			
         MOVE.B #'$',(A4)+      
         
-*BAD_GET
+BAD_GET
         MOVEQ   #4,D0
         MOVE.W  D6,D4
 
@@ -2098,11 +2098,28 @@ WAIT_MSG            DC.B    CR,LF,'Press any key to continue',CR,LF,0
 ENTER_TO_CONT_MSG   DC.B    CR,LF,'Press enter to continue',0
 FINISH_MSG      DC.B    CR,LF,'END',0
 BADDATA         DC.L 1
+FILLER		DC.L	80
+FILLER2		DC.L	80
+FILLER3		DC.L	80
+FILLER4		DC.L	80
+FILLER5		DC.L	80
+FILLER6		DC.L	80
+FILLER7		DC.L	80
+FILLER8		DC.L	80
+FILLER9		DC.L	80
+FILLER10		DC.L	80
+FILLER11		DC.L	80
+FILLER12		DC.L	80
+FILLER13		DC.L	80
+FILLER14		DC.L	80
+FILLER15		DC.L	80
+
 GOODDATA        DC.L 1
 
 LOW_ADDR    EQU     $00007000
 HIGH_ADDR   EQU     $00FFFFFE
     END    START        ; last line of source
+
 
 
 

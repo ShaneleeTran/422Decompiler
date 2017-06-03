@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 6/2/2017 7:11:32 PM
+Created On: 6/2/2017 8:44:23 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :
@@ -220,7 +220,7 @@ Created On: 6/2/2017 7:11:32 PM
 000011B0                           216  ****************************************************************************
 000011B0                           217  MAIN_LOOP     
 000011B0  3C1D                     218          MOVE.W  (A5)+,D6
-000011B2  47F9 00002628            219          LEA     GOODDATA,A3
+000011B2  47F9 00002664            219          LEA     GOODDATA,A3
 000011B8  49F9 00002624            220          LEA     BADDATA,A4
 000011BE  4EB9 000012A4            221          JSR     ADDRPRNT
 000011C4  4EB9 00001206            222          JSR     BAD
@@ -228,7 +228,7 @@ Created On: 6/2/2017 7:11:32 PM
 000011D0  BE38 00FF                224          CMP.B   $FF,D7
 000011D4  6700 0114                225          BEQ     BAD_PRINT
 000011D8  16FC 0000                226          MOVE.B  #$00,(A3)+
-000011DC  43F9 00002628            227          LEA     GOODDATA,A1
+000011DC  43F9 00002664            227          LEA     GOODDATA,A1
 000011E2  700D                     228          MOVEQ   #13,D0
 000011E4  4E4F                     229          TRAP    #15
 000011E6                           230  END_LOOP
@@ -254,7 +254,7 @@ Created On: 6/2/2017 7:11:32 PM
 00001226  18FC 0020                250          MOVE.B  #' ',(A4)+          
 0000122A  18FC 0024                251          MOVE.B #'$',(A4)+      
 0000122E                           252          
-0000122E                           253  *BAD_GET
+0000122E                           253  BAD_GET
 0000122E  7004                     254          MOVEQ   #4,D0
 00001230  3806                     255          MOVE.W  D6,D4
 00001232                           256  
@@ -2102,11 +2102,27 @@ Created On: 6/2/2017 7:11:32 PM
 00002604= 0D 0A 50 72 65 73 ...   2098  ENTER_TO_CONT_MSG   DC.B    CR,LF,'Press enter to continue',0
 0000261E= 0D 0A 45 4E 44 00       2099  FINISH_MSG      DC.B    CR,LF,'END',0
 00002624= 00000001                2100  BADDATA         DC.L 1
-00002628= 00000001                2101  GOODDATA        DC.L 1
-0000262C                          2102  
-0000262C  =00007000               2103  LOW_ADDR    EQU     $00007000
-0000262C  =00FFFFFE               2104  HIGH_ADDR   EQU     $00FFFFFE
-0000262C                          2105      END    START        ; last line of source
+00002628= 00000050                2101  FILLER      DC.L    80
+0000262C= 00000050                2102  FILLER2     DC.L    80
+00002630= 00000050                2103  FILLER3     DC.L    80
+00002634= 00000050                2104  FILLER4     DC.L    80
+00002638= 00000050                2105  FILLER5     DC.L    80
+0000263C= 00000050                2106  FILLER6     DC.L    80
+00002640= 00000050                2107  FILLER7     DC.L    80
+00002644= 00000050                2108  FILLER8     DC.L    80
+00002648= 00000050                2109  FILLER9     DC.L    80
+0000264C= 00000050                2110  FILLER10        DC.L    80
+00002650= 00000050                2111  FILLER11        DC.L    80
+00002654= 00000050                2112  FILLER12        DC.L    80
+00002658= 00000050                2113  FILLER13        DC.L    80
+0000265C= 00000050                2114  FILLER14        DC.L    80
+00002660= 00000050                2115  FILLER15        DC.L    80
+00002664                          2116  
+00002664= 00000001                2117  GOODDATA        DC.L 1
+00002668                          2118  
+00002668  =00007000               2119  LOW_ADDR    EQU     $00007000
+00002668  =00FFFFFE               2120  HIGH_ADDR   EQU     $00FFFFFE
+00002668                          2121      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -2171,6 +2187,7 @@ ASCII_TO_HEX        10F8
 BAD                 1206
 BADDATA             2624
 BAD_DATA_PRINT_W    23A2
+BAD_GET             122E
 BAD_INPUT           10F4
 BAD_INPUT_HIGH      1188
 BAD_INPUT_HIGH_MSG  25CA
@@ -2255,6 +2272,21 @@ ENDWORDDATA2        20D8
 END_INPUT           24C3
 END_LOOP            11E6
 ENTER_TO_CONT_MSG   2604
+FILLER              2628
+FILLER10            264C
+FILLER11            2650
+FILLER12            2654
+FILLER13            2658
+FILLER14            265C
+FILLER15            2660
+FILLER2             262C
+FILLER3             2630
+FILLER4             2634
+FILLER5             2638
+FILLER6             263C
+FILLER7             2640
+FILLER8             2644
+FILLER9             2648
 FINISHED            2460
 FINISHLIST          2108
 FINISH_MSG          261E
@@ -2264,7 +2296,7 @@ GET_LENGTH          14D6
 GET_MSB             1232
 GET_MSB1            12AA
 GET_MSB2            1504
-GOODDATA            2628
+GOODDATA            2664
 HIGH_ADDR           FFFFFE
 IMMEDIATE           1B5C
 IR0                 18AE
